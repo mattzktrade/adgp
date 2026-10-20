@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PackageMedia } from "@/components/site/PackageMedia";
+import { PhoneField } from "@/components/site/PhoneField";
 import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
 import { dayOptionsFor, EVENT, getPackage, PACKAGES, TIERS } from "@/lib/packages";
 import { submitAvailabilityRequest } from "@/lib/submit-enquiry";
@@ -183,6 +184,10 @@ function PackagePage() {
                     onSubmit={async (e) => {
                       e.preventDefault();
                       if (pending) return;
+                      if (!phone) {
+                        setError("Choose your country and enter your mobile number.");
+                        return;
+                      }
                       setPending(true);
                       setError(null);
                       try {
@@ -229,7 +234,7 @@ function PackagePage() {
                     <div className="mt-4 space-y-1">
                       <input required name="fullName" autoComplete="name" placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={field} />
                       <input required type="email" name="email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
-                      <input required type="tel" name="phone" autoComplete="tel" placeholder="Phone (with country code)" value={phone} onChange={(e) => setPhone(e.target.value)} className={field} />
+                      <PhoneField disabled={pending} fieldClassName={field} value={phone} onChange={setPhone} />
                       <input required type="number" name="guests" min={1} max={200} placeholder="Number of guests" value={guests} onChange={(e) => setGuests(e.target.value)} className={field} />
                     </div>
 
