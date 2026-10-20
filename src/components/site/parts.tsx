@@ -26,7 +26,7 @@ export function Nav({ solid = false }: { solid?: boolean }) {
     >
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-5 md:h-20 md:px-10">
         <Link to="/" aria-label="ZK Sports home" className="min-w-0">
-          <Logo className="h-6 max-w-[min(9.5rem,42vw)] md:h-9 md:max-w-none" />
+          <Logo className="h-8 w-auto md:h-9" />
         </Link>
         <nav className="hidden items-center gap-8 eyebrow text-muted-foreground lg:flex">
           <a href="/#race" className="transition-colors hover:text-foreground">The Race</a>

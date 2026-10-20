@@ -53,7 +53,7 @@ function Hero() {
     return () => clearInterval(i);
   }, []);
   return (
-    <section className="grain relative isolate min-h-[100svh] overflow-hidden md:h-[100svh] md:min-h-[720px]">
+    <section className="grain relative isolate overflow-hidden md:h-[100svh] md:min-h-[720px]">
       <img src={HERO_STILL} alt="" className="absolute inset-0 h-full w-full scale-105 object-cover object-[72%_center] md:object-center" />
       <div className="veil absolute inset-0" />
       <div className="veil-side absolute inset-0" />
@@ -67,19 +67,19 @@ function Hero() {
         </span>
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-end px-5 pb-8 pt-24 md:h-full md:px-10 md:pb-32 md:pt-28">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-col px-5 pb-16 pt-[5.75rem] md:h-full md:justify-end md:px-10 md:pb-32 md:pt-28">
         <Eyebrow className="animate-rise max-w-full">Formula 1® · Season Finale · Round 24</Eyebrow>
-        <h1 className="display mt-4 text-[clamp(2.55rem,12vw,7.75rem)] leading-[0.86] md:mt-5">
+        <h1 className="display mt-5 text-7xl leading-[0.86] md:mt-6 md:text-[8.2vw] xl:text-[7.75rem]">
           <span className="block animate-wipe">Abu Dhabi</span>
           <span className="block animate-wipe [animation-delay:150ms]">Grand Prix</span>
           <span className="block animate-wipe text-sand [animation-delay:300ms]">2026</span>
         </h1>
-        <div className="mt-6 grid gap-6 md:mt-10 md:grid-cols-[1fr_auto] md:items-end md:gap-8">
+        <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
           <div className="max-w-xl animate-rise [animation-delay:400ms]">
-            <p className="text-[0.95rem] leading-relaxed text-muted-foreground md:text-lg">
+            <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
               Yas Marina Circuit · {EVENT.dates}. From the Paddock Club™ to a terrace built over the track — choose where you watch the championship decided.
             </p>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap md:mt-7">
+            <div className="mt-7 flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
               <a href="#collection" className="chevron-btn w-full bg-primary px-5 py-3.5 pr-9 text-center font-display text-base font-bold uppercase tracking-wide text-primary-foreground transition-all [word-spacing:0.16em] hover:glow sm:w-auto sm:text-left md:px-7 md:py-4 md:pr-10 md:text-lg md:tracking-wider">
                 Explore packages
               </a>
@@ -89,7 +89,7 @@ function Hero() {
             </div>
           </div>
           <div className="min-w-0 animate-rise [animation-delay:600ms]">
-            <div className="eyebrow mb-2 max-w-full text-muted-foreground md:mb-3">Lights out · Sun 06 Dec · 17:00 GST</div>
+            <div className="eyebrow mb-3 max-w-full text-muted-foreground">Lights out · Sun 06 Dec · 17:00 GST</div>
             <Countdown />
           </div>
         </div>
