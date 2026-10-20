@@ -118,11 +118,6 @@
   }
 }
 
-@utility outline-text {
-  color: transparent;
-  -webkit-text-stroke: 1px oklch(0.96 0.005 80 / 0.55);
-}
-
 @utility veil {
   background: var(--gradient-veil);
 }

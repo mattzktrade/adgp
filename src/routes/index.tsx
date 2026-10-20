@@ -128,9 +128,6 @@ const STATS = [
 function Race() {
   return (
     <section id="race" className="relative overflow-hidden py-24 md:py-40">
-      <div className="pointer-events-none absolute -right-20 top-10 select-none display outline-text text-[34vw] leading-none opacity-40 md:text-[22rem]">
-        YAS
-      </div>
       <div className="relative mx-auto grid max-w-[1600px] gap-14 px-5 md:grid-cols-12 md:px-10">
         <div className="md:col-span-5">
           <Reveal>
