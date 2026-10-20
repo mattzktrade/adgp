@@ -20,13 +20,13 @@ export function Nav({ solid = false }: { solid?: boolean }) {
   const filled = solid || scrolled;
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-50 overflow-x-hidden transition-all duration-500 ${
         filled ? "border-b border-border bg-background/80 backdrop-blur-xl" : ""
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-5 md:h-20 md:px-10">
-        <Link to="/" aria-label="ZK Sports home">
-          <Logo className="h-7 md:h-9" />
+      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-5 md:h-20 md:px-10">
+        <Link to="/" aria-label="ZK Sports home" className="min-w-0">
+          <Logo className="h-6 max-w-[min(9.5rem,42vw)] md:h-9 md:max-w-none" />
         </Link>
         <nav className="hidden items-center gap-8 eyebrow text-muted-foreground lg:flex">
           <a href="/#race" className="transition-colors hover:text-foreground">The Race</a>
@@ -35,9 +35,10 @@ export function Nav({ solid = false }: { solid?: boolean }) {
         </nav>
         <a
           href="/#collection"
-          className="chevron-btn bg-primary px-5 py-2.5 pr-7 font-display text-sm font-bold uppercase tracking-wider text-primary-foreground transition-transform hover:translate-x-0.5 md:text-base"
+          className="chevron-btn shrink-0 whitespace-nowrap bg-primary px-4 py-2 pr-6 font-display text-sm font-bold uppercase tracking-wider text-primary-foreground transition-transform hover:translate-x-0.5 md:px-5 md:py-2.5 md:pr-7 md:text-base"
         >
-          Book your seat
+          <span className="sm:hidden">Book</span>
+          <span className="hidden sm:inline">Book your seat</span>
         </a>
       </div>
     </header>
@@ -73,14 +74,14 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
     ["Sec", pad(t?.s)],
   ];
   return (
-    <div className="flex items-end gap-3 md:gap-5">
+    <div className={`flex min-w-0 items-end ${compact ? "gap-2.5" : "gap-2 sm:gap-3 md:gap-5"}`}>
       {cells.map(([l, v], i) => (
-        <div key={l} className="flex items-end gap-3 md:gap-5">
+        <div key={l} className={`flex items-end ${compact ? "gap-2.5" : "gap-2 sm:gap-3 md:gap-5"}`}>
           <div>
-            <div className={`font-mono font-medium tabular-nums ${compact ? "text-2xl" : "text-3xl md:text-5xl"}`}>{v}</div>
+            <div className={`font-mono font-medium tabular-nums ${compact ? "text-2xl" : "text-2xl sm:text-3xl md:text-5xl"}`}>{v}</div>
             <div className="eyebrow mt-1 text-muted-foreground">{l}</div>
           </div>
-          {i < 3 && <span className={`pb-5 font-mono text-primary ${compact ? "text-xl" : "text-2xl md:text-4xl"}`}>:</span>}
+          {i < 3 && <span className={`pb-4 font-mono text-primary md:pb-5 ${compact ? "text-xl" : "text-lg sm:text-2xl md:text-4xl"}`}>:</span>}
         </div>
       ))}
     </div>
@@ -113,9 +114,9 @@ export function Reveal({ children, className = "", delay = 0 }: { children: Reac
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`eyebrow flex items-center gap-3 text-primary ${className}`}>
-      <span className="inline-block h-0 w-0 border-y-[5px] border-r-[7px] border-y-transparent border-r-primary" />
-      {children}
+    <div className={`eyebrow flex items-start gap-2.5 text-primary md:items-center md:gap-3 ${className}`}>
+      <span className="mt-[0.35em] inline-block h-0 w-0 shrink-0 border-y-[5px] border-r-[7px] border-y-transparent border-r-primary md:mt-0" />
+      <span className="min-w-0">{children}</span>
     </div>
   );
 }

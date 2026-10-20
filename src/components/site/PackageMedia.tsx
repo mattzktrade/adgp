@@ -53,10 +53,12 @@ function GalleryFilm({ src, poster, label }: { src: string; poster: string; labe
 export function PackageMedia({
   name,
   film,
+  filmPoster,
   photos,
 }: {
   name: string;
   film?: string;
+  filmPoster?: string;
   photos: string[];
 }) {
   const frames = useMemo(() => (film ? photos : photos.slice(1)), [film, photos]);
@@ -118,7 +120,7 @@ export function PackageMedia({
       <div className="grid grid-cols-6 gap-3 md:h-[520px] md:grid-rows-[repeat(2,minmax(0,1fr))]">
         <div className="col-span-6 aspect-[16/9] min-h-0 overflow-hidden md:col-span-4 md:row-span-2 md:aspect-auto">
           {film ? (
-            <GalleryFilm src={film} poster={photos[0] ?? ""} label={name} />
+            <GalleryFilm src={film} poster={filmPoster || photos[0] || ""} label={name} />
           ) : (
             <img
               src={photos[0]}

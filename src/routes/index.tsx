@@ -53,8 +53,8 @@ function Hero() {
     return () => clearInterval(i);
   }, []);
   return (
-    <section className="grain relative h-[100svh] min-h-[640px] overflow-hidden">
-      <img src={HERO_STILL} alt="" className="absolute inset-0 h-full w-full scale-105 object-cover" />
+    <section className="grain relative isolate min-h-[100svh] overflow-hidden md:h-[100svh] md:min-h-[720px]">
+      <img src={HERO_STILL} alt="" className="absolute inset-0 h-full w-full scale-105 object-cover object-[72%_center] md:object-center" />
       <div className="veil absolute inset-0" />
       <div className="veil-side absolute inset-0" />
       <div className="scanlines absolute inset-0 opacity-60" />
@@ -67,29 +67,29 @@ function Hero() {
         </span>
       </div>
 
-      <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-5 pb-28 md:px-10 md:pb-32">
-        <Eyebrow className="animate-rise">Formula 1® · Season Finale · Round 24</Eyebrow>
-        <h1 className="display mt-5 text-[15vw] leading-[0.82] sm:text-[12vw] md:text-[8.2vw] xl:text-[7.75rem]">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1600px] flex-col justify-end px-5 pb-8 pt-24 md:h-full md:px-10 md:pb-32 md:pt-28">
+        <Eyebrow className="animate-rise max-w-full">Formula 1® · Season Finale · Round 24</Eyebrow>
+        <h1 className="display mt-4 text-[clamp(2.55rem,12vw,7.75rem)] leading-[0.86] md:mt-5">
           <span className="block animate-wipe">Abu Dhabi</span>
           <span className="block animate-wipe [animation-delay:150ms]">Grand Prix</span>
           <span className="block animate-wipe text-sand [animation-delay:300ms]">2026</span>
         </h1>
-        <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
+        <div className="mt-6 grid gap-6 md:mt-10 md:grid-cols-[1fr_auto] md:items-end md:gap-8">
           <div className="max-w-xl animate-rise [animation-delay:400ms]">
-            <p className="text-base text-muted-foreground md:text-lg">
+            <p className="text-[0.95rem] leading-relaxed text-muted-foreground md:text-lg">
               Yas Marina Circuit · {EVENT.dates}. From the Paddock Club™ to a terrace built over the track — choose where you watch the championship decided.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#collection" className="chevron-btn bg-primary px-7 py-4 pr-10 font-display text-lg font-bold uppercase tracking-wider text-primary-foreground transition-all hover:glow">
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap md:mt-7">
+              <a href="#collection" className="chevron-btn w-full bg-primary px-5 py-3.5 pr-9 text-center font-display text-base font-bold uppercase tracking-wide text-primary-foreground transition-all [word-spacing:0.16em] hover:glow sm:w-auto sm:text-left md:px-7 md:py-4 md:pr-10 md:text-lg md:tracking-wider">
                 Explore packages
               </a>
-              <a href="#circuit" className="border border-foreground/30 px-7 py-4 font-display text-lg font-bold uppercase tracking-wider backdrop-blur-sm transition-colors hover:border-foreground">
+              <a href="#circuit" className="w-full border border-foreground/30 px-5 py-3.5 text-center font-display text-base font-bold uppercase tracking-wide backdrop-blur-sm transition-colors [word-spacing:0.16em] hover:border-foreground sm:w-auto sm:text-left md:px-7 md:py-4 md:text-lg md:tracking-wider">
                 View the circuit
               </a>
             </div>
           </div>
-          <div className="animate-rise [animation-delay:600ms]">
-            <div className="eyebrow mb-3 text-muted-foreground">Lights out · Sun 06 Dec · 17:00 GST</div>
+          <div className="min-w-0 animate-rise [animation-delay:600ms]">
+            <div className="eyebrow mb-2 max-w-full text-muted-foreground md:mb-3">Lights out · Sun 06 Dec · 17:00 GST</div>
             <Countdown />
           </div>
         </div>

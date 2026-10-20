@@ -134,7 +134,7 @@ function PackagePage() {
             ))}
           </div>
 
-          <PackageMedia name={p.name} film={p.reel} photos={p.gallery} />
+          <PackageMedia name={p.name} film={p.reel} filmPoster={p.reelPoster} photos={p.gallery} />
 
           {/* Included */}
           <div className="mt-24">

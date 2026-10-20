@@ -1,0 +1,8 @@
+node_modules
+.git
+.vercel
+.env
+.env.local
+public/skybridge
+public/marsa box
+public/velocity terrace
