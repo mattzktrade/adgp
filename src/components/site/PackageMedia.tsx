@@ -1,7 +1,21 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 
+type MediaItem =
+  | { type: "film"; src: string; poster: string }
+  | { type: "photo"; src: string };
+
 function pad(n: number) {
   return String(n).padStart(2, "0");
+}
+
+function PlayMark({ size = "lg" }: { size?: "sm" | "lg" }) {
+  const wrap = size === "lg" ? "h-16 w-16" : "h-7 w-7";
+  const tri = size === "lg" ? "border-y-[9px] border-l-[15px]" : "border-y-[5px] border-l-[8px]";
+  return (
+    <span className={`flex ${wrap} items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg`}>
+      <span className={`ml-0.5 inline-block h-0 w-0 ${tri} border-y-transparent border-l-current`} />
+    </span>
+  );
 }
 
 function GalleryFilm({ src, poster, label }: { src: string; poster: string; label: string }) {
@@ -35,14 +49,9 @@ function GalleryFilm({ src, poster, label }: { src: string; poster: string; labe
         onEnded={() => setPlaying(false)}
       />
       {!playing ? (
-        <button
-          type="button"
-          onClick={toggle}
-          className="absolute inset-0 flex items-center justify-center"
-          aria-label={`Play ${label} film`}
-        >
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105">
-            <span className="ml-1 inline-block h-0 w-0 border-y-[9px] border-l-[15px] border-y-transparent border-l-current" />
+        <button type="button" onClick={toggle} className="absolute inset-0 flex items-center justify-center" aria-label={`Play ${label} film`}>
+          <span className="transition-transform hover:scale-105">
+            <PlayMark />
           </span>
         </button>
       ) : null}
@@ -57,36 +66,78 @@ export function PackageMedia({
   photos,
 }: {
   name: string;
-  film?: string;
-  filmPoster?: string;
+  film?: string | undefined;
+  filmPoster?: string | undefined;
   photos: string[];
 }) {
-  const frames = useMemo(() => (film ? photos : photos.slice(1)), [film, photos]);
-  const [index, setIndex] = useState(film && photos.length > 2 ? 1 : 0);
+  const items = useMemo<MediaItem[]>(() => {
+    const next: MediaItem[] = [];
+    if (film) next.push({ type: "film", src: film, poster: filmPoster || photos[0] || "" });
+    for (const src of photos) next.push({ type: "photo", src });
+    return next;
+  }, [film, filmPoster, photos]);
+
+  const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [stripOverflow, setStripOverflow] = useState(false);
+  const stripRef = useRef<HTMLDivElement>(null);
   const drag = useRef<number | null>(null);
   const swiped = useRef(false);
-  const count = frames.length;
-  const canPage = Boolean(film) && count > 2;
+  const count = items.length;
+  const current = items[index];
+  const canPage = count > 1;
+  const photoIndexes = useMemo(() => items.flatMap((item, i) => (item.type === "photo" ? [i] : [])), [items]);
 
   const step = (dir: number) => setIndex((i) => (i + dir + count) % count);
-  const visible = count ? [frames[index % count], frames[(index + 1) % count]].filter(Boolean) : [];
+
+  const stepPhoto = (dir: number) => {
+    if (!photoIndexes.length) return;
+    const from = lightbox ?? index;
+    const at = photoIndexes.indexOf(from);
+    const next = photoIndexes[(at === -1 ? 0 : at + dir + photoIndexes.length) % photoIndexes.length]!;
+    setIndex(next);
+    setLightbox(next);
+  };
 
   useEffect(() => {
-    if (!canPage) return;
-    for (const src of frames) {
+    setIndex(0);
+    setLightbox(null);
+  }, [name, film]);
+
+  useEffect(() => {
+    for (const item of items) {
+      const src = item.type === "film" ? item.poster : item.src;
+      if (!src) continue;
       const img = new Image();
       img.decoding = "async";
       img.src = src;
     }
-  }, [canPage, frames]);
+  }, [items]);
+
+  useEffect(() => {
+    const root = stripRef.current;
+    if (!root) return;
+    const update = () => setStripOverflow(root.scrollWidth > root.clientWidth + 8);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(root);
+    return () => ro.disconnect();
+  }, [items, canPage]);
+
+  useEffect(() => {
+    const root = stripRef.current;
+    const thumb = root?.querySelector<HTMLElement>(`[data-thumb="${index}"]`);
+    if (!root || !thumb) return;
+    const left = thumb.offsetLeft - (root.clientWidth - thumb.offsetWidth) / 2;
+    root.scrollTo({ left, behavior: "smooth" });
+  }, [index]);
 
   useEffect(() => {
     if (lightbox === null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightbox(null);
-      if (e.key === "ArrowRight") setLightbox((i) => (i === null ? i : (i + 1) % count));
-      if (e.key === "ArrowLeft") setLightbox((i) => (i === null ? i : (i - 1 + count) % count));
+      if (e.key === "ArrowRight") stepPhoto(1);
+      if (e.key === "ArrowLeft") stepPhoto(-1);
     };
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -95,7 +146,7 @@ export function PackageMedia({
       document.body.style.overflow = previous;
       window.removeEventListener("keydown", onKey);
     };
-  }, [lightbox, count]);
+  }, [lightbox, photoIndexes, index]);
 
   const onPointerDown = (e: PointerEvent) => {
     if (!canPage) return;
@@ -114,93 +165,133 @@ export function PackageMedia({
     }
   };
 
+  if (!current) return null;
+
+  const scrollStrip = (dir: number) => {
+    stripRef.current?.scrollBy({ left: dir * 220, behavior: "smooth" });
+  };
+
+  const photoNumber = current.type === "photo" ? photoIndexes.indexOf(index) + 1 : 0;
+
   return (
-    <div className="mt-14">
-      <div className="relative">
-      <div className="grid grid-cols-6 gap-3 md:h-[520px] md:grid-rows-[repeat(2,minmax(0,1fr))]">
-        <div className="col-span-6 aspect-[16/9] min-h-0 overflow-hidden md:col-span-4 md:row-span-2 md:aspect-auto">
-          {film ? (
-            <GalleryFilm src={film} poster={filmPoster || photos[0] || ""} label={name} />
-          ) : (
-            <img
-              src={photos[0]}
-              alt={`${name} view`}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-            />
-          )}
-        </div>
-        {visible.map((src, i) => {
-          const photoIndex = (index + i) % count;
-          const className = "col-span-3 aspect-[4/3] min-h-0 overflow-hidden text-left md:col-span-2 md:aspect-auto";
-          const image = (
-            <img
-              src={src}
-              alt=""
-              loading="eager"
-              draggable={false}
-              decoding="async"
-              className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-            />
-          );
-          if (!canPage) {
-            return (
-              <div key={`${src}-${photoIndex}`} className={className}>
-                {image}
-              </div>
-            );
-          }
-          return (
-            <button
-              key={`${src}-${photoIndex}`}
-              type="button"
-              onClick={() => {
-                if (swiped.current) {
-                  swiped.current = false;
-                  return;
-                }
-                setLightbox(photoIndex);
-              }}
-              onPointerDown={onPointerDown}
-              onPointerUp={onPointerUp}
-              className={className}
-              aria-label={`Open photo ${photoIndex + 1} of ${count}`}
-            >
-              {image}
-            </button>
-          );
-        })}
-      </div>
+    <div className="mt-14" data-package-media>
+      <div className="relative aspect-video overflow-hidden bg-black" data-featured={current.type}>
+        {current.type === "film" ? (
+          <GalleryFilm src={current.src} poster={current.poster} label={name} />
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (swiped.current) {
+                swiped.current = false;
+                return;
+              }
+              setLightbox(index);
+            }}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            className="h-full w-full"
+            aria-label={`Open photo ${photoNumber} of ${photoIndexes.length}`}
+          >
+            <img src={current.src} alt={`${name} at Yas Marina Circuit`} draggable={false} decoding="async" className="h-full w-full object-cover" />
+          </button>
+        )}
+
         {canPage ? (
-          <div className="absolute bottom-3 right-3 z-10 flex gap-2">
-            <button
-              type="button"
-              onClick={() => step(-1)}
-              className="pointer-events-auto flex h-11 w-11 items-center justify-center border border-white/30 bg-background/75 font-display text-lg backdrop-blur-sm transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
-              aria-label="Previous photos"
-            >
-              ←
-            </button>
-            <button
-              type="button"
-              onClick={() => step(1)}
-              className="pointer-events-auto flex h-11 w-11 items-center justify-center border border-white/30 bg-background/75 font-display text-lg backdrop-blur-sm transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
-              aria-label="Next photos"
-            >
-              →
-            </button>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/65 to-transparent p-3 pt-10">
+            <span className="font-mono text-xs text-white/80">
+              {current.type === "film" ? "Film" : `Photo ${pad(photoNumber)}`}
+              <span className="text-white/50">
+                {" "}
+                · {pad(index + 1)} / {pad(count)}
+              </span>
+            </span>
+            <div className="pointer-events-auto flex gap-2">
+              <button
+                type="button"
+                onClick={() => step(-1)}
+                className="flex h-11 w-11 items-center justify-center border border-white/30 bg-background/75 font-display text-lg backdrop-blur-sm transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                aria-label="Previous"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={() => step(1)}
+                className="flex h-11 w-11 items-center justify-center border border-white/30 bg-background/75 font-display text-lg backdrop-blur-sm transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
+                aria-label="Next"
+              >
+                →
+              </button>
+            </div>
           </div>
         ) : null}
       </div>
+
       {canPage ? (
-        <div className="mt-3 flex items-center justify-between">
-          <span className="font-mono text-xs text-muted-foreground">{pad(count)} photos</span>
-          <span className="eyebrow text-muted-foreground">Swipe, or open a photo</span>
+        <div className="mt-3 flex items-center gap-2">
+          {stripOverflow ? (
+            <button
+              type="button"
+              onClick={() => scrollStrip(-1)}
+              className="hidden h-[4.5rem] w-10 shrink-0 items-center justify-center border border-border text-lg text-muted-foreground transition-colors hover:border-primary hover:text-foreground md:flex"
+              aria-label="Scroll photos back"
+            >
+              ←
+            </button>
+          ) : null}
+          <div
+            ref={stripRef}
+            className="no-scrollbar flex min-w-0 flex-1 snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain py-1"
+          >
+            {items.map((item, i) => {
+              const src = item.type === "film" ? item.poster : item.src;
+              const active = i === index;
+              return (
+                <button
+                  key={`${item.type}-${src}-${i}`}
+                  type="button"
+                  data-thumb={i}
+                  onClick={() => setIndex(i)}
+                  className={`relative h-16 w-[5.5rem] shrink-0 snap-start md:h-[4.5rem] md:w-28 ${
+                    active ? "outline outline-2 outline-primary outline-offset-2" : "opacity-70 hover:opacity-100"
+                  }`}
+                  aria-label={item.type === "film" ? `Show ${name} film` : `Show photo ${photoIndexes.indexOf(i) + 1}`}
+                  aria-current={active ? "true" : undefined}
+                >
+                  <span className="absolute inset-0 overflow-hidden">
+                    <img src={src} alt="" draggable={false} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    {item.type === "film" ? (
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                        <PlayMark size="sm" />
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {stripOverflow ? (
+            <button
+              type="button"
+              onClick={() => scrollStrip(1)}
+              className="hidden h-[4.5rem] w-10 shrink-0 items-center justify-center border border-border text-lg text-muted-foreground transition-colors hover:border-primary hover:text-foreground md:flex"
+              aria-label="Scroll photos forward"
+            >
+              →
+            </button>
+          ) : null}
         </div>
       ) : null}
 
-      {lightbox !== null ? (
+      {canPage ? (
+        <div className="mt-3 flex items-center justify-between">
+          <span className="font-mono text-xs text-muted-foreground">{pad(photos.length || count)} photos</span>
+          <span className="eyebrow text-muted-foreground">Swipe, or tap a photo</span>
+        </div>
+      ) : null}
+
+      {lightbox !== null && items[lightbox]?.type === "photo" ? (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-background/95 p-4 md:p-10"
           role="dialog"
@@ -210,28 +301,36 @@ export function PackageMedia({
             if (e.target === e.currentTarget) setLightbox(null);
           }}
         >
-          <button type="button" onClick={() => setLightbox(null)} className="absolute right-5 top-5 font-display text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground">
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute right-5 top-5 font-display text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+          >
             Close
           </button>
-          <button
-            type="button"
-            onClick={() => setLightbox((i) => (i === null ? i : (i - 1 + count) % count))}
-            className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center border border-border bg-background text-xl md:left-6"
-            aria-label="Previous photo"
-          >
-            ←
-          </button>
-          <img src={frames[lightbox]} alt="" className="max-h-[85svh] max-w-[calc(100%-7rem)] object-contain" />
-          <button
-            type="button"
-            onClick={() => setLightbox((i) => (i === null ? i : (i + 1) % count))}
-            className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center border border-border bg-background text-xl md:right-6"
-            aria-label="Next photo"
-          >
-            →
-          </button>
+          {photoIndexes.length > 1 ? (
+            <button
+              type="button"
+              onClick={() => stepPhoto(-1)}
+              className="absolute left-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center border border-border bg-background text-xl md:left-6"
+              aria-label="Previous photo"
+            >
+              ←
+            </button>
+          ) : null}
+          <img src={items[lightbox].src} alt={`${name} at Yas Marina Circuit`} className="max-h-[85svh] max-w-[calc(100%-7rem)] object-contain" />
+          {photoIndexes.length > 1 ? (
+            <button
+              type="button"
+              onClick={() => stepPhoto(1)}
+              className="absolute right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center border border-border bg-background text-xl md:right-6"
+              aria-label="Next photo"
+            >
+              →
+            </button>
+          ) : null}
           <div className="absolute bottom-5 font-mono text-xs text-muted-foreground">
-            {pad(lightbox + 1)} / {pad(count)}
+            {pad(photoIndexes.indexOf(lightbox) + 1)} / {pad(photoIndexes.length)}
           </div>
         </div>
       ) : null}

@@ -10,11 +10,90 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as CorporateRouteImport } from './routes/corporate'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as OfficialAccessRouteImport } from './routes/official-access'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as CheckoutCancelRouteImport } from './routes/checkout.cancel'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesHowToBuyRouteImport } from './routes/guides.how-to-buy'
+import { Route as GuidesPaddockClubRouteImport } from './routes/guides.paddock-club'
+import { Route as GuidesYasMarinaSeatsRouteImport } from './routes/guides.yas-marina-seats'
+import { Route as PackagesIndexRouteImport } from './routes/packages.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe.webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CorporateRoute = CorporateRouteImport.update({
+  id: '/corporate',
+  path: '/corporate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficialAccessRoute = OfficialAccessRouteImport.update({
+  id: '/official-access',
+  path: '/official-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutCancelRoute = CheckoutCancelRouteImport.update({
+  id: '/checkout/cancel',
+  path: '/checkout/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesHowToBuyRoute = GuidesHowToBuyRouteImport.update({
+  id: '/guides/how-to-buy',
+  path: '/guides/how-to-buy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesPaddockClubRoute = GuidesPaddockClubRouteImport.update({
+  id: '/guides/paddock-club',
+  path: '/guides/paddock-club',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesYasMarinaSeatsRoute = GuidesYasMarinaSeatsRouteImport.update({
+  id: '/guides/yas-marina-seats',
+  path: '/guides/yas-marina-seats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackagesIndexRoute = PackagesIndexRouteImport.update({
+  id: '/packages/',
+  path: '/packages/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PackagesSlugRoute = PackagesSlugRouteImport.update({
@@ -22,31 +101,141 @@ const PackagesSlugRoute = PackagesSlugRouteImport.update({
   path: '/packages/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/compare': typeof CompareRoute
+  '/corporate': typeof CorporateRoute
+  '/faq': typeof FaqRoute
+  '/official-access': typeof OfficialAccessRoute
+  '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/checkout/cancel': typeof CheckoutCancelRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
+  '/guides/how-to-buy': typeof GuidesHowToBuyRoute
+  '/guides/paddock-club': typeof GuidesPaddockClubRoute
+  '/guides/yas-marina-seats': typeof GuidesYasMarinaSeatsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/guides/': typeof GuidesIndexRoute
+  '/packages/': typeof PackagesIndexRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/compare': typeof CompareRoute
+  '/corporate': typeof CorporateRoute
+  '/faq': typeof FaqRoute
+  '/official-access': typeof OfficialAccessRoute
+  '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/checkout/cancel': typeof CheckoutCancelRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
+  '/guides/how-to-buy': typeof GuidesHowToBuyRoute
+  '/guides/paddock-club': typeof GuidesPaddockClubRoute
+  '/guides/yas-marina-seats': typeof GuidesYasMarinaSeatsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/guides': typeof GuidesIndexRoute
+  '/packages': typeof PackagesIndexRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/compare': typeof CompareRoute
+  '/corporate': typeof CorporateRoute
+  '/faq': typeof FaqRoute
+  '/official-access': typeof OfficialAccessRoute
+  '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/checkout/cancel': typeof CheckoutCancelRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
+  '/guides/how-to-buy': typeof GuidesHowToBuyRoute
+  '/guides/paddock-club': typeof GuidesPaddockClubRoute
+  '/guides/yas-marina-seats': typeof GuidesYasMarinaSeatsRoute
   '/packages/$slug': typeof PackagesSlugRoute
+  '/guides/': typeof GuidesIndexRoute
+  '/packages/': typeof PackagesIndexRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/packages/$slug'
+  fullPaths:
+    | '/'
+    | '/compare'
+    | '/corporate'
+    | '/faq'
+    | '/official-access'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/checkout/cancel'
+    | '/checkout/success'
+    | '/guides/how-to-buy'
+    | '/guides/paddock-club'
+    | '/guides/yas-marina-seats'
+    | '/packages/$slug'
+    | '/guides/'
+    | '/packages/'
+    | '/api/stripe/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/packages/$slug'
-  id: '__root__' | '/' | '/packages/$slug'
+  to:
+    | '/'
+    | '/compare'
+    | '/corporate'
+    | '/faq'
+    | '/official-access'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/checkout/cancel'
+    | '/checkout/success'
+    | '/guides/how-to-buy'
+    | '/guides/paddock-club'
+    | '/guides/yas-marina-seats'
+    | '/packages/$slug'
+    | '/guides'
+    | '/packages'
+    | '/api/stripe/webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/compare'
+    | '/corporate'
+    | '/faq'
+    | '/official-access'
+    | '/privacy'
+    | '/sitemap.xml'
+    | '/checkout/cancel'
+    | '/checkout/success'
+    | '/guides/how-to-buy'
+    | '/guides/paddock-club'
+    | '/guides/yas-marina-seats'
+    | '/packages/$slug'
+    | '/guides/'
+    | '/packages/'
+    | '/api/stripe/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompareRoute: typeof CompareRoute
+  CorporateRoute: typeof CorporateRoute
+  FaqRoute: typeof FaqRoute
+  OfficialAccessRoute: typeof OfficialAccessRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  CheckoutCancelRoute: typeof CheckoutCancelRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  GuidesHowToBuyRoute: typeof GuidesHowToBuyRoute
+  GuidesPaddockClubRoute: typeof GuidesPaddockClubRoute
+  GuidesYasMarinaSeatsRoute: typeof GuidesYasMarinaSeatsRoute
   PackagesSlugRoute: typeof PackagesSlugRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
+  PackagesIndexRoute: typeof PackagesIndexRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +247,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/corporate': {
+      id: '/corporate'
+      path: '/corporate'
+      fullPath: '/corporate'
+      preLoaderRoute: typeof CorporateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/official-access': {
+      id: '/official-access'
+      path: '/official-access'
+      fullPath: '/official-access'
+      preLoaderRoute: typeof OfficialAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/cancel': {
+      id: '/checkout/cancel'
+      path: '/checkout/cancel'
+      fullPath: '/checkout/cancel'
+      preLoaderRoute: typeof CheckoutCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/how-to-buy': {
+      id: '/guides/how-to-buy'
+      path: '/guides/how-to-buy'
+      fullPath: '/guides/how-to-buy'
+      preLoaderRoute: typeof GuidesHowToBuyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/paddock-club': {
+      id: '/guides/paddock-club'
+      path: '/guides/paddock-club'
+      fullPath: '/guides/paddock-club'
+      preLoaderRoute: typeof GuidesPaddockClubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/yas-marina-seats': {
+      id: '/guides/yas-marina-seats'
+      path: '/guides/yas-marina-seats'
+      fullPath: '/guides/yas-marina-seats'
+      preLoaderRoute: typeof GuidesYasMarinaSeatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/packages/': {
+      id: '/packages/'
+      path: '/packages'
+      fullPath: '/packages/'
+      preLoaderRoute: typeof PackagesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/packages/$slug': {
       id: '/packages/$slug'
       path: '/packages/$slug'
@@ -65,12 +345,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PackagesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompareRoute: CompareRoute,
+  CorporateRoute: CorporateRoute,
+  FaqRoute: FaqRoute,
+  OfficialAccessRoute: OfficialAccessRoute,
+  PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  CheckoutCancelRoute: CheckoutCancelRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
+  GuidesHowToBuyRoute: GuidesHowToBuyRoute,
+  GuidesPaddockClubRoute: GuidesPaddockClubRoute,
+  GuidesYasMarinaSeatsRoute: GuidesYasMarinaSeatsRoute,
   PackagesSlugRoute: PackagesSlugRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
+  PackagesIndexRoute: PackagesIndexRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,23 +3,21 @@ import { useEffect, useState } from "react";
 import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
 import { CredentialBadges } from "@/components/site/CredentialBadges";
 import { CircuitMap } from "@/components/site/CircuitMap";
+import { formatMoney, loadCatalogOverlays, type PackageOverlay } from "@/lib/crm-catalog";
 import { EVENT, PACKAGES, TIERS, type Pkg, type Tier } from "@/lib/packages";
+import { breadcrumbJsonLd, eventJsonLd, pageHead } from "@/lib/seo";
+import { BRAND, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Abu Dhabi Grand Prix 2026 Hospitality | ZK Sports & Entertainment" },
-      {
-        name: "description",
-        content:
-          "Ten ways to experience the F1 season finale at Yas Marina Circuit, 4–6 Dec 2026. Paddock Club™, signature lounges and grandstands from ZK Sports.",
-      },
-      { property: "og:title", content: "Abu Dhabi Grand Prix 2026 — ZK Hospitality Collection" },
-      { property: "og:description", content: "One circuit, ten locations. The F1 season finale at Yas Marina, 4–6 Dec 2026." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  loader: async () => ({ overlays: Object.fromEntries(await loadCatalogOverlays()) }),
+  head: () =>
+    pageHead({
+      title: "Abu Dhabi Grand Prix 2026 hospitality & official tickets | ZK Sports & Entertainment",
+      description:
+        "Official Abu Dhabi GP 2026 hospitality and tickets at Yas Marina Circuit, 4–6 December. Paddock Club™, ZK signature lounges and grandstands from an authorised onseller. Live prices where we sell online.",
+      path: PATHS.home,
+      jsonLd: [eventJsonLd(), breadcrumbJsonLd([{ name: "Abu Dhabi GP 2026", path: PATHS.home }])],
+    }),
   component: Index,
 });
 
@@ -27,6 +25,7 @@ const HERO_STILL = "/gallery/skybridge-181.jpg";
 const CREDENTIALS_STILL = encodeURI("/west grandstand/ADGP_Web_West_Grandstand_1920x694px_V2.jpg");
 
 function Index() {
+  const { overlays } = Route.useLoaderData();
   return (
     <div className="relative">
       <Nav />
@@ -34,7 +33,8 @@ function Index() {
       <Ticker />
       <Race />
       <CircuitExplorer />
-      <Collection />
+      <Collection overlays={overlays} />
+      <CompareSnapshot overlays={overlays} />
       <Credentials />
       <Footer />
     </div>
@@ -54,14 +54,12 @@ function Hero() {
   }, []);
   return (
     <section className="grain relative isolate overflow-hidden md:h-[100svh] md:min-h-[720px]">
-      <img src={HERO_STILL} alt="" className="absolute inset-0 h-full w-full scale-105 object-cover object-[72%_center] md:object-center" />
+      <img src={HERO_STILL} alt={BRAND.defaultOgAlt} className="absolute inset-0 h-full w-full scale-105 object-cover object-[72%_center] md:object-center" />
       <div className="veil absolute inset-0" />
       <div className="veil-side absolute inset-0" />
       <div className="scanlines absolute inset-0 opacity-60" />
 
-      {/* HUD corners */}
-      <div className="pointer-events-none absolute inset-x-5 top-24 hidden justify-between font-mono text-[11px] text-muted-foreground md:inset-x-10 md:flex">
-        <span>24.4672°N · 54.6031°E</span>
+      <div className="pointer-events-none absolute inset-x-5 top-24 hidden justify-end font-mono text-[11px] text-muted-foreground md:inset-x-10 md:flex">
         <span>
           YAS ISLAND <span className="text-foreground">{time || "--:--:--"}</span> GST
         </span>
@@ -76,20 +74,30 @@ function Hero() {
         </h1>
         <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
           <div className="max-w-xl animate-rise [animation-delay:400ms]">
-            <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-              Yas Marina Circuit · {EVENT.dates}. From the Paddock Club™ to a terrace built over the track — choose where you watch the championship decided.
+            <p className="text-base leading-relaxed text-foreground/85 md:hidden">
+              Official hospitality and tickets at {EVENT.circuit}, {EVENT.raceWeekend}. Paddock Club™, ZK lounges and grandstands from an authorised onseller.
             </p>
+            <p className="hidden text-base leading-relaxed text-foreground/85 md:block md:text-lg">
+              {BRAND.legalName} sells official {EVENT.name} hospitality and tickets at {EVENT.circuit}. Race weekend {EVENT.raceWeekend}; Fanzone and concerts from {EVENT.fanOpens}. Ten venues — F1® Paddock Club™, ZK-hosted lounges and grandstands — from an authorised distributor and official onseller. Live prices on the package pages; we reply to questions within {BRAND.responseTime}.
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">{BRAND.credentials}</p>
             <div className="mt-7 flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
-              <a href="#collection" className="chevron-btn w-full bg-primary px-5 py-3.5 pr-9 text-center font-display text-base font-bold uppercase tracking-wide text-primary-foreground transition-all [word-spacing:0.16em] hover:glow sm:w-auto sm:text-left md:px-7 md:py-4 md:pr-10 md:text-lg md:tracking-wider">
+              <Link
+                to={PATHS.packages}
+                className="chevron-btn w-full bg-primary px-5 py-3.5 pr-9 text-center font-display text-base font-bold uppercase tracking-wide text-primary-foreground transition-all [word-spacing:0.16em] hover:glow sm:w-auto sm:text-left md:px-7 md:py-4 md:pr-10 md:text-lg md:tracking-wider"
+              >
                 Explore packages
-              </a>
-              <a href="#circuit" className="w-full border border-foreground/30 px-5 py-3.5 text-center font-display text-base font-bold uppercase tracking-wide backdrop-blur-sm transition-colors [word-spacing:0.16em] hover:border-foreground sm:w-auto sm:text-left md:px-7 md:py-4 md:text-lg md:tracking-wider">
-                View the circuit
-              </a>
+              </Link>
+              <Link
+                to={PATHS.compare}
+                className="w-full border border-foreground/30 px-5 py-3.5 text-center font-display text-base font-bold uppercase tracking-wide backdrop-blur-sm transition-colors [word-spacing:0.16em] hover:border-foreground sm:w-auto sm:text-left md:px-7 md:py-4 md:text-lg md:tracking-wider"
+              >
+                Compare venues
+              </Link>
             </div>
           </div>
           <div className="min-w-0 animate-rise [animation-delay:600ms]">
-            <div className="eyebrow mb-3 max-w-full text-muted-foreground">Lights out · Sun 06 Dec · 17:00 GST</div>
+            <div className="eyebrow mb-3 max-w-full text-muted-foreground">Lights out · {EVENT.lightsOutLabel}</div>
             <Countdown />
           </div>
         </div>
@@ -235,7 +243,7 @@ function CircuitExplorer() {
   );
 }
 
-function Collection() {
+function Collection({ overlays }: { overlays: Record<string, PackageOverlay> }) {
   const [tier, setTier] = useState<Tier | "all">("all");
   const list = PACKAGES.filter((p) => tier === "all" || p.tier === tier);
   return (
@@ -265,7 +273,7 @@ function Collection() {
 
         <div className="mt-14 divide-y divide-border border-y border-border">
           {list.map((p) => (
-            <PackageRow key={p.id} p={p} />
+            <PackageRow key={p.id} p={p} overlay={overlays[p.slug]} />
           ))}
         </div>
       </div>
@@ -273,7 +281,7 @@ function Collection() {
   );
 }
 
-function PackageRow({ p }: { p: Pkg }) {
+function PackageRow({ p, overlay }: { p: Pkg; overlay?: PackageOverlay }) {
   return (
     <Link
       to="/packages/$slug"
@@ -289,12 +297,73 @@ function PackageRow({ p }: { p: Pkg }) {
       <span className="col-span-2 eyebrow text-muted-foreground md:col-span-1">{p.where}</span>
       <span className="hidden text-sm text-muted-foreground md:block">{p.headline}</span>
       <span className="col-span-2 flex items-center gap-3 font-display text-lg font-bold uppercase md:col-span-1">
-        <span className="text-sand">{p.hosted ? "Hosted by ZK" : TIERS[p.tier].short}</span>
+        <span className="text-sand">
+          {overlay?.fromPrice ? formatMoney(overlay.fromPrice, overlay.currency) : p.hosted ? "Hosted by ZK" : TIERS[p.tier].short}
+        </span>
         <span className="flex h-11 w-11 items-center justify-center border border-border transition-all group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
           →
         </span>
       </span>
     </Link>
+  );
+}
+
+function CompareSnapshot({ overlays }: { overlays: Record<string, PackageOverlay> }) {
+  return (
+    <section className="border-t border-border bg-asphalt py-24 md:py-32">
+      <div className="mx-auto max-w-[1600px] px-5 md:px-10">
+        <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <Eyebrow>At a glance</Eyebrow>
+            <h2 className="display mt-6 text-5xl md:text-7xl">
+              Ten venues, <span className="text-sand">one circuit.</span>
+            </h2>
+          </div>
+          <Link to={PATHS.compare} className="eyebrow text-muted-foreground hover:text-foreground">
+            Full comparison →
+          </Link>
+        </Reveal>
+        <div className="mt-12 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <caption className="sr-only">
+              Abu Dhabi Grand Prix 2026 hospitality and ticket packages sold by ZK Sports & Entertainment
+            </caption>
+            <thead>
+              <tr className="eyebrow text-muted-foreground">
+                <th className="border-b border-border py-3 pr-4 font-normal">Package</th>
+                <th className="border-b border-border py-3 pr-4 font-normal">Tier</th>
+                <th className="border-b border-border py-3 pr-4 font-normal">View</th>
+                <th className="border-b border-border py-3 pr-4 font-normal">Best for</th>
+                <th className="border-b border-border py-3 pr-4 font-normal">Days</th>
+                <th className="border-b border-border py-3 font-normal">From</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PACKAGES.map((pkg) => (
+                <tr key={pkg.slug} className="align-top">
+                  <td className="border-b border-border py-4 pr-4">
+                    <Link to="/packages/$slug" params={{ slug: pkg.slug }} className="font-display text-lg font-bold uppercase hover:text-primary">
+                      {pkg.name}
+                    </Link>
+                  </td>
+                  <td className="border-b border-border py-4 pr-4 text-muted-foreground">{TIERS[pkg.tier].short}</td>
+                  <td className="border-b border-border py-4 pr-4 text-muted-foreground">{pkg.where}</td>
+                  <td className="border-b border-border py-4 pr-4">{pkg.bestFor}</td>
+                  <td className="border-b border-border py-4 pr-4 text-muted-foreground">{pkg.daysLabel}</td>
+                  <td className="border-b border-border py-4 text-muted-foreground">
+                    {overlays[pkg.slug]?.fromPrice
+                      ? formatMoney(overlays[pkg.slug]!.fromPrice!, overlays[pkg.slug]!.currency)
+                      : pkg.slug === "paddock-club"
+                        ? "Contact"
+                        : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -313,11 +382,11 @@ function Credentials() {
         <Reveal delay={120} className="self-end">
           <CredentialBadges />
           <p className="mt-6 text-muted-foreground">
-            Trusted access, expert support and seamless delivery — prices and availability on request. Pick a package and we'll come back to you within one working day.
+            Trusted access, expert support and seamless delivery. Live prices sit on each package page. Paddock Club variants stay with a consultant.
           </p>
-          <a href="#collection" className="chevron-btn mt-8 inline-block bg-primary px-7 py-4 pr-10 font-display text-lg font-bold uppercase tracking-wider text-primary-foreground">
-            Check availability
-          </a>
+          <Link to={PATHS.packages} className="chevron-btn mt-8 inline-block bg-primary px-7 py-4 pr-10 font-display text-lg font-bold uppercase tracking-wider text-primary-foreground">
+            View packages
+          </Link>
         </Reveal>
       </div>
     </section>

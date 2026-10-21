@@ -11,7 +11,10 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { GA_MEASUREMENT_ID } from "../lib/analytics";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { organizationJsonLd, websiteJsonLd } from "../lib/seo";
+import { BRAND } from "../lib/site";
 
 function NotFoundComponent() {
   return (
@@ -78,11 +81,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ZK Sports & Entertainment" },
-      { name: "description", content: "Premium F1 hospitality from ZK Sports & Entertainment." },
+      { title: BRAND.legalName },
+      { name: "description", content: BRAND.description },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: BRAND.legalName },
       { name: "twitter:card", content: "summary_large_image" },
-      
     ],
     links: [
       {
@@ -92,6 +95,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(organizationJsonLd()),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(websiteJsonLd()),
+      },
+      ...(GA_MEASUREMENT_ID
+        ? [
+            {
+              src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
+              async: true,
+            },
+            {
+              children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}');`,
+            },
+          ]
+        : []),
     ],
   }),
   shellComponent: RootShell,

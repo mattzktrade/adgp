@@ -1,5 +1,5 @@
 const PADDOCK_BADGE = "/F1_Paddock_Club_Premium_2x.png";
-const YAS_BADGE = "/Yas_Marina_Official_On_Seller_Premium_2x.png";
+const ETHARA_BADGE = "/ethara_logo_transparent.png";
 
 export function CredentialBadges({
   variant = "full",
@@ -19,10 +19,15 @@ export function CredentialBadges({
         draggable={false}
       />
       <img
-        src={YAS_BADGE}
-        alt="Yas Marina Circuit — Official On-Seller"
-        style={{ width: compact ? 180 : 260 }}
-        className="h-auto block"
+        src={ETHARA_BADGE}
+        alt="Ethara — Official Onseller"
+        style={{
+          width: compact ? 180 : 260,
+          height: compact ? 106 : 153,
+          objectFit: "cover",
+          objectPosition: "center",
+        }}
+        className="block"
         draggable={false}
       />
     </div>
