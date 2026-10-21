@@ -12,27 +12,34 @@ export type PageHeadInput = {
   jsonLd?: Record<string, unknown>[];
 };
 
+/** Slack, iMessage and some crawlers print `&amp;` if the title contains `&`. */
+export function plainMeta(text: string): string {
+  return text.replace(/\s*&\s*/g, " and ").replace(/\s+/g, " ").trim();
+}
+
 export function pageHead({ title, description, path, image, imageAlt, noindex, jsonLd }: PageHeadInput) {
   const url = absoluteUrl(path);
   const ogImage = absoluteUrl(image || BRAND.defaultOgPath);
-  const ogAlt = imageAlt || BRAND.defaultOgAlt;
+  const pageTitle = plainMeta(title);
+  const pageDescription = plainMeta(description);
+  const ogAlt = plainMeta(imageAlt || BRAND.defaultOgAlt);
 
   return {
     meta: [
-      { title },
-      { name: "description", content: description },
+      { title: pageTitle },
+      { name: "description", content: pageDescription },
       ...(noindex ? [{ name: "robots", content: "noindex, nofollow" }] : []),
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
+      { property: "og:title", content: pageTitle },
+      { property: "og:description", content: pageDescription },
       { property: "og:type", content: "website" },
       { property: "og:url", content: url },
       { property: "og:image", content: ogImage },
       { property: "og:image:alt", content: ogAlt },
-      { property: "og:site_name", content: BRAND.legalName },
+      { property: "og:site_name", content: plainMeta(BRAND.legalName) },
       { property: "og:locale", content: "en_GB" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: title },
-      { name: "twitter:description", content: description },
+      { name: "twitter:title", content: pageTitle },
+      { name: "twitter:description", content: pageDescription },
       { name: "twitter:image", content: ogImage },
     ],
     links: [{ rel: "canonical", href: url }],

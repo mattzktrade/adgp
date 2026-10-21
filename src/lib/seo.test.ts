@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { PACKAGES } from "@/lib/packages";
 import { BRAND, SITE_URL, absoluteUrl, packagePath } from "@/lib/site";
-import { buildSitemapXml, pageHead, productJsonLd, sitemapEntries } from "@/lib/seo";
+import { buildSitemapXml, pageHead, plainMeta, productJsonLd, sitemapEntries } from "@/lib/seo";
 
 describe("SEO helpers", () => {
   it("builds production canonicals and Open Graph tags", () => {
@@ -15,6 +15,27 @@ describe("SEO helpers", () => {
     expect(head.links).toEqual([{ rel: "canonical", href: `${SITE_URL}/compare` }]);
     expect(head.meta.some((tag) => "property" in tag && tag.property === "og:image")).toBe(true);
     expect(head.meta.some((tag) => "name" in tag && tag.name === "twitter:image")).toBe(true);
+  });
+
+  it("writes ampersands as and so Slack previews do not show &amp;", () => {
+    expect(plainMeta("hospitality & official tickets | ZK Sports & Entertainment")).toBe(
+      "hospitality and official tickets | ZK Sports and Entertainment",
+    );
+    const head = pageHead({
+      title: "Abu Dhabi Grand Prix 2026 hospitality & official tickets | ZK Sports & Entertainment",
+      description: "Tickets from ZK Sports & Entertainment",
+      path: "/",
+    });
+    const title = head.meta.find((tag) => "title" in tag && !("name" in tag) && !("property" in tag));
+    expect(title).toMatchObject({ title: "Abu Dhabi Grand Prix 2026 hospitality and official tickets | ZK Sports and Entertainment" });
+    expect(head.meta).toContainEqual({
+      property: "og:title",
+      content: "Abu Dhabi Grand Prix 2026 hospitality and official tickets | ZK Sports and Entertainment",
+    });
+    expect(head.meta).toContainEqual({
+      property: "og:site_name",
+      content: "ZK Sports and Entertainment",
+    });
   });
 
   it("lists every public page and package in the sitemap", () => {

@@ -13,7 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { GA_MEASUREMENT_ID } from "../lib/analytics";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { organizationJsonLd, websiteJsonLd } from "../lib/seo";
+import { organizationJsonLd, plainMeta, websiteJsonLd } from "../lib/seo";
 import { BRAND } from "../lib/site";
 
 function NotFoundComponent() {
@@ -81,10 +81,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: BRAND.legalName },
-      { name: "description", content: BRAND.description },
+      { title: plainMeta(BRAND.legalName) },
+      { name: "description", content: plainMeta(BRAND.description) },
+      { name: "theme-color", content: "#0A0A0A" },
+      { name: "application-name", content: BRAND.shortName },
+      { name: "apple-mobile-web-app-title", content: BRAND.shortName },
+      { name: "msapplication-TileColor", content: "#0A0A0A" },
+      { name: "msapplication-TileImage", content: "/mstile-150x150.png" },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: BRAND.legalName },
+      { property: "og:site_name", content: plainMeta(BRAND.legalName) },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -92,7 +97,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
+      { rel: "icon", type: "image/png", sizes: "48x48", href: "/favicon-48x48.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" },
     ],
