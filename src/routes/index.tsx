@@ -34,7 +34,6 @@ function Index() {
       <Race />
       <CircuitExplorer />
       <Collection overlays={overlays} />
-      <CompareSnapshot overlays={overlays} />
       <Credentials />
       <Footer />
     </div>
@@ -135,7 +134,7 @@ const STATS = [
 
 function Race() {
   return (
-    <section id="race" className="relative overflow-hidden py-24 md:py-40">
+    <section id="race" className="relative overflow-hidden py-12 md:py-40">
       <div className="relative mx-auto grid max-w-[1600px] gap-14 px-5 md:grid-cols-12 md:px-10">
         <div className="md:col-span-5">
           <Reveal>
@@ -172,7 +171,7 @@ function Race() {
 function CircuitExplorer() {
   const [sel, setSel] = useState<Pkg>(PACKAGES[0]!);
   return (
-    <section id="circuit" className="relative bg-asphalt py-24 md:py-32">
+    <section id="circuit" className="relative bg-asphalt py-12 md:py-32">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10">
         <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -247,7 +246,7 @@ function Collection({ overlays }: { overlays: Record<string, PackageOverlay> }) 
   const [tier, setTier] = useState<Tier | "all">("all");
   const list = PACKAGES.filter((p) => tier === "all" || p.tier === tier);
   return (
-    <section id="collection" className="relative py-24 md:py-32">
+    <section id="collection" className="relative py-12 md:py-32">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10">
         <Reveal className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <div>
@@ -256,114 +255,92 @@ function Collection({ overlays }: { overlays: Record<string, PackageOverlay> }) 
               Choose your <span className="text-sand">package.</span>
             </h2>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {(["all", "signature", "official", "grandstand"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTier(t)}
-                className={`border px-4 py-2 eyebrow transition-colors ${
-                  tier === t ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t === "all" ? "All ten" : TIERS[t].short}
-              </button>
-            ))}
+          <div className="flex flex-col items-start gap-4 md:items-end">
+            <div className="flex flex-wrap gap-2">
+              {(["all", "signature", "official", "grandstand"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTier(t)}
+                  className={`border px-4 py-2 eyebrow transition-colors ${
+                    tier === t ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t === "all" ? "All ten" : TIERS[t].short}
+                </button>
+              ))}
+            </div>
+            <Link to={PATHS.compare} className="eyebrow text-muted-foreground hover:text-foreground">
+              Full comparison →
+            </Link>
           </div>
         </Reveal>
 
-        <div className="mt-14 divide-y divide-border border-y border-border">
-          {list.map((p) => (
-            <PackageRow key={p.id} p={p} overlay={overlays[p.slug]} />
-          ))}
+        <div className="mt-14">
+          <div className={`${PACKAGE_GRID} hidden border-b border-border pb-3 eyebrow text-muted-foreground md:grid`}>
+            <span>Package</span>
+            <span>View</span>
+            <span>Best for</span>
+            <span>Days</span>
+            <span className="flex items-center justify-end gap-3">
+              From
+              <span className="w-11" aria-hidden />
+            </span>
+          </div>
+          <div className="divide-y divide-border border-b border-border">
+            {list.map((p) => (
+              <PackageRow key={p.id} p={p} overlay={overlays[p.slug]} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
+const PACKAGE_GRID =
+  "md:grid-cols-[minmax(12rem,2.1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)_minmax(0,1fr)_10.75rem] md:items-start md:gap-x-8";
+
+function fromPriceLabel(p: Pkg, overlay?: PackageOverlay) {
+  if (overlay?.fromPrice) return formatMoney(overlay.fromPrice, overlay.currency);
+  return p.slug === "paddock-club" ? "Contact" : "—";
+}
+
 function PackageRow({ p, overlay }: { p: Pkg; overlay?: PackageOverlay }) {
+  const price = fromPriceLabel(p, overlay);
   return (
     <Link
       to="/packages/$slug"
       params={{ slug: p.slug }}
-      className="group relative grid grid-cols-[auto_1fr] items-center gap-x-5 gap-y-4 py-6 md:grid-cols-[80px_1.4fr_1fr_1fr_auto] md:gap-8 md:py-9"
+      className={`group relative grid grid-cols-1 gap-3 py-6 md:py-8 ${PACKAGE_GRID}`}
     >
-      {/* mobile image */}
-      <div className="col-span-2 aspect-[16/9] overflow-hidden md:hidden">
+      <div className="aspect-[16/9] overflow-hidden md:hidden">
         <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover" />
       </div>
-      <span className="font-mono text-sm text-primary">{p.id}</span>
-      <h3 className="display text-4xl transition-transform duration-500 group-hover:translate-x-3 md:text-7xl">{p.name}</h3>
-      <span className="col-span-2 eyebrow text-muted-foreground md:col-span-1">{p.where}</span>
-      <span className="hidden text-sm text-muted-foreground md:block">{p.headline}</span>
-      <span className="col-span-2 flex items-center gap-3 font-display text-lg font-bold uppercase md:col-span-1">
-        <span className="text-sand">
-          {overlay?.fromPrice ? formatMoney(overlay.fromPrice, overlay.currency) : p.hosted ? "Hosted by ZK" : TIERS[p.tier].short}
-        </span>
-        <span className="flex h-11 w-11 items-center justify-center border border-border transition-all group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
-          →
-        </span>
-      </span>
-    </Link>
-  );
-}
-
-function CompareSnapshot({ overlays }: { overlays: Record<string, PackageOverlay> }) {
-  return (
-    <section className="border-t border-border bg-asphalt py-24 md:py-32">
-      <div className="mx-auto max-w-[1600px] px-5 md:px-10">
-        <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <Eyebrow>At a glance</Eyebrow>
-            <h2 className="display mt-6 text-5xl md:text-7xl">
-              Ten venues, <span className="text-sand">one circuit.</span>
-            </h2>
-          </div>
-          <Link to={PATHS.compare} className="eyebrow text-muted-foreground hover:text-foreground">
-            Full comparison →
-          </Link>
-        </Reveal>
-        <div className="mt-12 overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <caption className="sr-only">
-              Abu Dhabi Grand Prix 2026 hospitality and ticket packages sold by ZK Sports & Entertainment
-            </caption>
-            <thead>
-              <tr className="eyebrow text-muted-foreground">
-                <th className="border-b border-border py-3 pr-4 font-normal">Package</th>
-                <th className="border-b border-border py-3 pr-4 font-normal">Tier</th>
-                <th className="border-b border-border py-3 pr-4 font-normal">View</th>
-                <th className="border-b border-border py-3 pr-4 font-normal">Best for</th>
-                <th className="border-b border-border py-3 pr-4 font-normal">Days</th>
-                <th className="border-b border-border py-3 font-normal">From</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PACKAGES.map((pkg) => (
-                <tr key={pkg.slug} className="align-top">
-                  <td className="border-b border-border py-4 pr-4">
-                    <Link to="/packages/$slug" params={{ slug: pkg.slug }} className="font-display text-lg font-bold uppercase hover:text-primary">
-                      {pkg.name}
-                    </Link>
-                  </td>
-                  <td className="border-b border-border py-4 pr-4 text-muted-foreground">{TIERS[pkg.tier].short}</td>
-                  <td className="border-b border-border py-4 pr-4 text-muted-foreground">{pkg.where}</td>
-                  <td className="border-b border-border py-4 pr-4">{pkg.bestFor}</td>
-                  <td className="border-b border-border py-4 pr-4 text-muted-foreground">{pkg.daysLabel}</td>
-                  <td className="border-b border-border py-4 text-muted-foreground">
-                    {overlays[pkg.slug]?.fromPrice
-                      ? formatMoney(overlays[pkg.slug]!.fromPrice!, overlays[pkg.slug]!.currency)
-                      : pkg.slug === "paddock-club"
-                        ? "Contact"
-                        : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <h3 className="display text-4xl leading-none transition-transform duration-500 group-hover:translate-x-3 md:whitespace-nowrap md:text-[clamp(2rem,2.5vw,3.25rem)]">
+        {p.slug === "paddock-club" ? "Paddock Club" : p.name}
+      </h3>
+      <div className="min-w-0 text-sm leading-5 text-muted-foreground md:min-h-[2.875rem] md:pt-1.5 md:line-clamp-2">
+        <div className="eyebrow mb-1 md:hidden">View</div>
+        {p.where}
+      </div>
+      <div className="min-w-0 text-sm leading-5 md:min-h-[2.875rem] md:pt-1.5 md:line-clamp-2">
+        <div className="eyebrow mb-1 text-muted-foreground md:hidden">Best for</div>
+        {p.bestFor}
+      </div>
+      <div className="min-w-0 text-sm leading-5 text-muted-foreground md:min-h-[2.875rem] md:pt-1.5 md:line-clamp-2">
+        <div className="eyebrow mb-1 md:hidden">Days</div>
+        {p.daysLabel}
+      </div>
+      <div className="md:pt-0">
+        <div className="eyebrow mb-1 text-muted-foreground md:hidden">From</div>
+        <div className="flex items-center justify-start gap-3 whitespace-nowrap font-display text-lg font-bold uppercase md:justify-end">
+          <span className="text-sand">{price}</span>
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-border transition-all group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
+            →
+          </span>
         </div>
       </div>
-    </section>
+    </Link>
   );
 }
 

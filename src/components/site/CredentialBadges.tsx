@@ -10,24 +10,17 @@ export function CredentialBadges({
 }) {
   const compact = variant === "compact";
   return (
-    <div className={`flex flex-wrap items-center gap-8 md:gap-10 ${className}`}>
+    <div className={`flex flex-row flex-nowrap items-center gap-5 md:gap-8 ${className}`}>
       <img
         src={PADDOCK_BADGE}
         alt="Formula 1 Paddock Club — Authorised Distributor"
-        style={{ width: compact ? 210 : 320 }}
-        className="h-auto block"
+        className={`w-auto object-contain ${compact ? "h-14 md:h-16" : "h-16 md:h-24"}`}
         draggable={false}
       />
       <img
         src={ETHARA_BADGE}
         alt="Ethara — Official Onseller"
-        style={{
-          width: compact ? 180 : 260,
-          height: compact ? 106 : 153,
-          objectFit: "cover",
-          objectPosition: "center",
-        }}
-        className="block"
+        className={`w-auto object-contain ${compact ? "h-14 md:h-16" : "h-16 md:h-24"}`}
         draggable={false}
       />
     </div>
