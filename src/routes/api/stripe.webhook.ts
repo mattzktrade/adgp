@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { fulfillCheckoutSession, refundAndAlert, releaseCheckoutSession } from "@/lib/stripe-webhook";
+import { fulfillCheckoutSession, isPermanentFulfillmentFailure, refundAndAlert, releaseCheckoutSession } from "@/lib/stripe-webhook";
 
 async function handleStripeWebhook(request: Request): Promise<Response> {
   const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
@@ -29,8 +29,11 @@ async function handleStripeWebhook(request: Request): Promise<Response> {
       const result = await fulfillCheckoutSession(session);
       if (!result.ok) {
         console.error("[stripe webhook] commit failed", result.message);
-        await refundAndAlert({ stripe, session, reason: result.message || "CRM commit failed after payment" });
-        return new Response(JSON.stringify({ ok: true, refunded: true }), { status: 200 });
+        if (isPermanentFulfillmentFailure(result.message) || result.retryable === false) {
+          await refundAndAlert({ stripe, session, reason: result.message || "CRM commit failed after payment" });
+          return new Response(JSON.stringify({ ok: true, refunded: true }), { status: 200 });
+        }
+        return new Response(JSON.stringify({ error: result.message }), { status: 500 });
       }
     }
     if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {

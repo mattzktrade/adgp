@@ -66,6 +66,7 @@ export type CrmOrderLookup = {
   orderReference?: string;
   dealReference?: string | null;
   packageName?: string | null;
+  day?: string | null;
   guests?: number;
   totalAmount?: number;
   currency?: string;

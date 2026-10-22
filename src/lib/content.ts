@@ -32,7 +32,7 @@ export const SHARED_FAQS: FaqItem[] = [
   },
   {
     q: "Are the prices on this site live?",
-    a: "Yes for the packages we sell online. The figure is the current CRM retail price and remaining allocation. Paddock Club team suites stay on request because the SKU changes.",
+    a: "Yes for the packages we sell online. The figure is the current CRM price and remaining allocation. Paddock Club team suites stay on request because the SKU changes.",
   },
   {
     q: "How fast do you reply?",
@@ -200,7 +200,7 @@ export const GUIDES: GuidePage[] = [
         heading: "What happens when you buy",
         body: [
           "Choose the package and day, enter the guest count, and pay by card on Stripe Checkout. The CRM takes the seats immediately and opens a paid Website deal for the team.",
-          "Stripe emails your receipt. Closer to race week the promoter issues digital tickets and we send arrival notes. Paddock Club variants still go through a consultant.",
+          "We email a booking confirmation as soon as payment is taken. Closer to race week the promoter issues digital tickets and we send arrival notes. Paddock Club variants still go through a consultant.",
         ],
       },
       {

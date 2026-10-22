@@ -27,7 +27,7 @@ describe("catalog content for search", () => {
     const howToBuy = GUIDES.find((guide) => guide.path === PATHS.howToBuy);
     expect(howToBuy?.lead).toMatch(/Pay online|pay by card|live-priced/i);
     expect(howToBuy?.sections.some((section) => section.body.join(" ").includes("Stripe"))).toBe(true);
-    expect(SHARED_FAQS.some((faq) => faq.a.includes("current CRM retail price"))).toBe(true);
+    expect(SHARED_FAQS.some((faq) => faq.a.includes("current CRM price"))).toBe(true);
   });
 
   it("does not clone the shared FAQ onto package pages", () => {

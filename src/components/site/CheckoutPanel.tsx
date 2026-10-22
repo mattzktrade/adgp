@@ -27,7 +27,7 @@ export function CheckoutPanel({
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [guests, setGuests] = useState("");
+  const [guests, setGuests] = useState("1");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -43,7 +43,13 @@ export function CheckoutPanel({
   const canBuy = checkoutEnabled && Boolean(selected?.buyable) && pkg.slug !== "paddock-club";
   const soldOut = Boolean(selected && !selected.buyable && selected.reason === "sold_out");
   const unitPrice = selected?.buyable ? selected.unitPrice : overlay.fromPrice;
-  const total = selected?.buyable && guestCount > 0 ? selected.unitPrice * guestCount : null;
+  const currency = selected?.currency || overlay.currency;
+  const validGuests = Number.isInteger(guestCount) && guestCount > 0;
+  const total = selected?.buyable && validGuests ? selected.unitPrice * guestCount : null;
+
+  const changeGuests = (next: number) => {
+    setGuests(String(Math.min(200, Math.max(1, next))));
+  };
 
   return (
     <div className="border border-border bg-card">
@@ -66,11 +72,15 @@ export function CheckoutPanel({
                 setError("Choose your country and enter your mobile number.");
                 return;
               }
+              if (!validGuests) {
+                setError("Enter how many guests you are booking for.");
+                return;
+              }
               setPending(true);
               setError(null);
               try {
                 if (canBuy) {
-                  trackBeginCheckout({ packageName: pkg.name, day, guests: Number(guests), value: total ?? 0 });
+                  trackBeginCheckout({ packageName: pkg.name, day, guests: guestCount, value: total ?? 0 });
                   const result = await createCheckoutSession({
                     data: {
                       slug: pkg.slug,
@@ -78,7 +88,7 @@ export function CheckoutPanel({
                       fullName,
                       email,
                       phone,
-                      guests: Number(guests),
+                      guests: guestCount,
                     },
                   });
                   if (!result.ok) {
@@ -99,14 +109,14 @@ export function CheckoutPanel({
                     fullName,
                     email,
                     phone,
-                    guests: Number(guests),
+                    guests: guestCount,
                   },
                 });
                 if (!result.ok) {
                   setError(result.message);
                   return;
                 }
-                trackGenerateLead({ packageName: pkg.name, day, guests: Number(guests) });
+                trackGenerateLead({ packageName: pkg.name, day, guests: guestCount });
                 setSent(true);
               } catch {
                 setError("We couldn't send that just now. Please try again in a moment.");
@@ -117,29 +127,42 @@ export function CheckoutPanel({
           >
             <div className="eyebrow text-muted-foreground">{canBuy ? "Buy your seats" : soldOut ? "Sold out" : "Get in touch"}</div>
             <div className="display mt-2 text-3xl">{pkg.name}</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              {unitPrice
-                ? `${formatMoney(unitPrice, selected?.currency || overlay.currency)}${canBuy ? " per guest" : " from"}`
-                : soldOut
-                  ? "This day is sold out"
-                  : "Live allocation · contact us for Paddock Club and sold-out dates"}
-            </div>
+            {unitPrice ? (
+              <div className="mt-5">
+                <div className="font-display text-5xl leading-none">{formatMoney(unitPrice, currency)}</div>
+                <div className="mt-2 text-sm text-muted-foreground">
+                  {canBuy ? `Per guest · ${day}` : "From, per guest"}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-3 text-sm text-muted-foreground">
+                {soldOut ? "This day is sold out" : "Live allocation · contact us for Paddock Club and sold-out dates"}
+              </div>
+            )}
             {selected ? (
               <div className="mt-2 text-sm text-muted-foreground">{availabilityLabel(selected.sellable, selected.buyable)}</div>
             ) : null}
 
             <div className="mt-7 grid grid-cols-2 gap-2">
-              {dayOptions.map((d) => (
-                <button
-                  type="button"
-                  key={d}
-                  disabled={pending}
-                  onClick={() => setDay(d)}
-                  className={`border px-3 py-2.5 text-sm transition-colors disabled:opacity-60 ${dayOptions.length === 1 ? "col-span-2" : ""} ${day === d ? "border-primary bg-primary/10 text-foreground" : "border-input text-muted-foreground hover:border-foreground/40"}`}
-                >
-                  {d}
-                </button>
-              ))}
+              {dayOptions.map((d) => {
+                const option = overlay.days.find((item) => item.day === d);
+                return (
+                  <button
+                    type="button"
+                    key={d}
+                    disabled={pending}
+                    onClick={() => setDay(d)}
+                    className={`border px-3 py-3 text-left transition-colors disabled:opacity-60 ${dayOptions.length === 1 ? "col-span-2" : ""} ${day === d ? "border-primary bg-primary/10 text-foreground" : "border-input text-muted-foreground hover:border-foreground/40"}`}
+                  >
+                    <div className="text-sm">{d}</div>
+                    {option?.buyable && option.unitPrice > 0 ? (
+                      <div className="mt-1 font-display text-lg text-foreground">{formatMoney(option.unitPrice, option.currency)}</div>
+                    ) : (
+                      <div className="mt-1 text-xs">{option?.reason === "sold_out" ? "Sold out" : "Contact"}</div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {canBuy || !checkoutEnabled ? (
@@ -147,13 +170,57 @@ export function CheckoutPanel({
                 <input required name="fullName" autoComplete="name" placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={field} />
                 <input required type="email" name="email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
                 <PhoneField disabled={pending} fieldClassName={field} value={phone} onChange={setPhone} />
-                <input required type="number" name="guests" min={1} max={200} placeholder="Number of guests" value={guests} onChange={(e) => setGuests(e.target.value)} className={field} />
+                <div className="flex items-end justify-between gap-4 border-b border-input py-3">
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Guests</div>
+                    <div className="mt-1 text-sm text-muted-foreground">How many people</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={pending || guestCount <= 1}
+                      onClick={() => changeGuests(guestCount - 1)}
+                      className="flex h-9 w-9 items-center justify-center border border-input text-lg disabled:opacity-40"
+                      aria-label="Fewer guests"
+                    >
+                      −
+                    </button>
+                    <input
+                      required
+                      type="number"
+                      name="guests"
+                      min={1}
+                      max={200}
+                      value={guests}
+                      onChange={(e) => setGuests(e.target.value)}
+                      className="w-14 bg-transparent text-center text-lg outline-none"
+                    />
+                    <button
+                      type="button"
+                      disabled={pending || guestCount >= 200}
+                      onClick={() => changeGuests(guestCount + 1)}
+                      className="flex h-9 w-9 items-center justify-center border border-input text-lg disabled:opacity-40"
+                      aria-label="More guests"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : null}
 
-            {total && canBuy ? (
-              <div className="mt-5 text-sm">
-                Total {formatMoney(total, selected?.currency || overlay.currency)} for {guestCount} guest{guestCount === 1 ? "" : "s"}
+            {canBuy && total ? (
+              <div className="mt-6 border border-border p-4">
+                <div className="flex items-start justify-between gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    {guestCount} guest{guestCount === 1 ? "" : "s"} · {day}
+                  </span>
+                  <span>{formatMoney(unitPrice || 0, currency)} each</span>
+                </div>
+                <div className="mt-3 flex items-end justify-between gap-4 border-t border-border pt-3">
+                  <span className="eyebrow text-muted-foreground">Total to pay</span>
+                  <span className="font-display text-3xl leading-none">{formatMoney(total, currency)}</span>
+                </div>
               </div>
             ) : null}
 
@@ -161,10 +228,10 @@ export function CheckoutPanel({
 
             {canBuy ? (
               <button
-                disabled={pending}
+                disabled={pending || !total}
                 className="chevron-btn mt-7 w-full bg-primary py-4 font-display text-lg font-bold uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
               >
-                {pending ? "Opening checkout…" : "Pay securely"}
+                {pending ? "Opening checkout…" : total ? `Pay ${formatMoney(total, currency)} securely` : "Pay securely"}
               </button>
             ) : checkoutEnabled ? (
               <p className="mt-7 text-sm text-muted-foreground">

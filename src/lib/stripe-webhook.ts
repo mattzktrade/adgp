@@ -1,6 +1,16 @@
 import type Stripe from "stripe";
 
-import { crmAdgpFetch } from "@/lib/crm-client";
+import { crmAdgpFetch, type CrmOrderLookup } from "@/lib/crm-client";
+
+export type FulfillCheckoutResult =
+  | ({ ok: true } & Partial<CrmOrderLookup>)
+  | { ok: false; message: string; retryable: boolean };
+
+export function isPermanentFulfillmentFailure(message: string): boolean {
+  return /insufficient_stock|leaves_one_remaining|hold_package_mismatch|hold_price_mismatch|hold_guests_mismatch|hold_currency_mismatch|package_not_found|package_enquiry_only|event_has_ended|client_email_required|client_name_required|missing CRM metadata/i.test(
+    message,
+  );
+}
 
 function metadata(session: Stripe.Checkout.Session) {
   const meta = session.metadata ?? {};
@@ -29,10 +39,10 @@ function billing(session: Stripe.Checkout.Session) {
   };
 }
 
-export async function fulfillCheckoutSession(session: Stripe.Checkout.Session): Promise<{ ok: boolean; message?: string }> {
+export async function fulfillCheckoutSession(session: Stripe.Checkout.Session): Promise<FulfillCheckoutResult> {
   const meta = metadata(session);
   if (!meta.holdId || !meta.packageId || !session.id) {
-    return { ok: false, message: "Checkout session is missing CRM metadata." };
+    return { ok: false, message: "Checkout session is missing CRM metadata.", retryable: false };
   }
   const response = await crmAdgpFetch("/orders", {
     method: "POST",
@@ -53,9 +63,21 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session): 
   });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
-    return { ok: false, message: detail.slice(0, 400) || `CRM commit failed (${response.status})` };
+    const message = detail.slice(0, 400) || `CRM commit failed (${response.status})`;
+    return { ok: false, message, retryable: response.status >= 500 || response.status === 409 || !isPermanentFulfillmentFailure(message) };
   }
-  return { ok: true };
+  const body = (await response.json().catch(() => ({}))) as CrmOrderLookup & { orderReference?: string };
+  return {
+    ok: true,
+    pending: false,
+    orderId: body.orderId,
+    orderReference: body.orderReference,
+    dealReference: body.dealReference,
+    packageName: body.packageName,
+    guests: body.guests ?? meta.guests,
+    totalAmount: body.totalAmount,
+    currency: body.currency || meta.currency,
+  };
 }
 
 export async function releaseCheckoutSession(session: Stripe.Checkout.Session): Promise<void> {

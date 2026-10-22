@@ -4,6 +4,7 @@ import { z } from "zod";
 import { crmAdgpFetch, isCheckoutReady, isCrmCatalogConfigured, type CrmHold, type CrmOrderLookup } from "@/lib/crm-client";
 import { dayOptionsFor, getPackage } from "@/lib/packages";
 import { SITE_URL } from "@/lib/site";
+import { fulfillCheckoutSession } from "@/lib/stripe-webhook";
 
 const checkoutInput = z.object({
   slug: z.string().trim().min(1).max(80),
@@ -154,5 +155,73 @@ export const lookupCheckoutOrder = createServerFn({ method: "GET" })
     } catch (error) {
       console.error("[checkout] lookup failed", error);
       return { ok: true as const, pending: true };
+    }
+  });
+
+export const confirmPaidCheckout = createServerFn({ method: "POST" })
+  .validator(z.object({ sessionId: z.string().trim().min(1).max(200) }))
+  .handler(async ({ data }) => {
+    if (!isCrmCatalogConfigured() || !stripeSecret()) {
+      return { ok: true as const, pending: true as const };
+    }
+    try {
+      const existing = await crmAdgpFetch(`/orders?stripeSessionId=${encodeURIComponent(data.sessionId)}`);
+      if (existing.ok) {
+        const body = (await existing.json()) as CrmOrderLookup;
+        if (!body.pending && body.orderReference) {
+          return { ok: true as const, pending: false as const, ...body };
+        }
+      }
+    } catch (error) {
+      console.error("[checkout] pre-confirm lookup failed", error);
+    }
+
+    try {
+      const Stripe = (await import("stripe")).default;
+      const stripe = new Stripe(stripeSecret());
+      const session = await stripe.checkout.sessions.retrieve(data.sessionId, {
+        expand: ["customer_details"],
+      });
+      if (session.payment_status !== "paid") {
+        return { ok: true as const, pending: true as const };
+      }
+      const fulfilled = await fulfillCheckoutSession(session);
+      if (!fulfilled.ok) {
+        console.error("[checkout] confirm commit failed", fulfilled.message);
+        return {
+          ok: false as const,
+          pending: true as const,
+          message: "We received your payment and are confirming the booking now.",
+        };
+      }
+      try {
+        const lookup = await crmAdgpFetch(`/orders?stripeSessionId=${encodeURIComponent(data.sessionId)}`);
+        if (lookup.ok) {
+          const body = (await lookup.json()) as CrmOrderLookup;
+          if (!body.pending && body.orderReference) {
+            return { ok: true as const, pending: false as const, ...body };
+          }
+        }
+      } catch (error) {
+        console.error("[checkout] post-confirm lookup failed", error);
+      }
+      return {
+        ok: true as const,
+        pending: false as const,
+        orderId: fulfilled.orderId,
+        orderReference: fulfilled.orderReference,
+        dealReference: fulfilled.dealReference,
+        packageName: fulfilled.packageName,
+        guests: fulfilled.guests,
+        totalAmount: fulfilled.totalAmount,
+        currency: fulfilled.currency,
+      };
+    } catch (error) {
+      console.error("[checkout] confirm failed", error);
+      return {
+        ok: false as const,
+        pending: true as const,
+        message: "We received your payment and are confirming the booking now.",
+      };
     }
   });
