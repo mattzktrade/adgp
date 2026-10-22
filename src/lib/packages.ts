@@ -124,7 +124,7 @@ export const PACKAGES: Pkg[] = [
       },
       {
         q: "How do I book Skybridge?",
-        a: "Choose Friday, Saturday, Sunday or the 3-day weekend, enter the guest count and pay securely on this page. If you have a question first, email info@zk-sports.com or WhatsApp us.",
+        a: "Choose Friday, Saturday, Sunday or the 3-day weekend, enter the guest count and pay securely on this page. If you have a question first, email contact@zk-sports.com or WhatsApp us.",
       },
     ],
     image: media("/gallery/skybridge-181.jpg"),

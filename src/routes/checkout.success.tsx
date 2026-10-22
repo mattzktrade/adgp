@@ -7,7 +7,7 @@ import { trackPurchase } from "@/lib/analytics";
 import { confirmPaidCheckout, lookupCheckoutOrder } from "@/lib/checkout";
 import { formatMoney } from "@/lib/crm-catalog";
 import { pageHead } from "@/lib/seo";
-import { BRAND, PATHS } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/checkout/success")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -142,7 +142,7 @@ function CheckoutSuccessPage() {
           <p className="mt-6 text-lg text-muted-foreground">
             {state.status === "confirming"
               ? "Your card payment went through. We are confirming the booking and will show your reference here in a moment."
-              : "Your card payment went through. If your reference is not on this page yet, email info@zk-sports.com with the name and email you paid with and we will confirm it."}
+              : `Your card payment went through. If your reference is not on this page yet, email ${CONTACT_EMAIL} with the name and email you paid with and we will confirm it.`}
           </p>
         )}
         <Link to={PATHS.packages} className="mt-10 inline-block font-display text-lg font-bold uppercase text-primary">

@@ -1,5 +1,5 @@
 import { EVENT, type FaqItem } from "@/lib/packages";
-import { BRAND, PATHS } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, PATHS } from "@/lib/site";
 
 export const SHARED_FAQS: FaqItem[] = [
   {
@@ -12,7 +12,7 @@ export const SHARED_FAQS: FaqItem[] = [
   },
   {
     q: "Can I book for a group or a company?",
-    a: "Yes. We regularly host corporate groups, from a single table to a private area. Buy a listed package online, or email info@zk-sports.com for a private area or mixed inventory.",
+    a: `Yes. We regularly host corporate groups, from a single table to a private area. Buy a listed package online, or email ${CONTACT_EMAIL} for a private area or mixed inventory.`,
   },
   {
     q: "How do tickets arrive?",

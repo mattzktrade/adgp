@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { PACKAGES } from "@/lib/packages";
-import { BRAND, SITE_URL, absoluteUrl, packagePath } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, CONTACT_WHATSAPP_HREF, CONTACT_WHATSAPP_LABEL, SITE_URL, absoluteUrl, packagePath } from "@/lib/site";
 import { buildSitemapXml, pageHead, plainMeta, productJsonLd, sitemapEntries } from "@/lib/seo";
 
 describe("SEO helpers", () => {
@@ -54,6 +54,9 @@ describe("SEO helpers", () => {
   it("keeps the brand entity stable", () => {
     expect(BRAND.legalName).toBe("ZK Sports & Entertainment");
     expect(BRAND.sameAs).toContain("https://www.zk-sports.com");
+    expect(CONTACT_EMAIL).toBe("contact@zk-sports.com");
+    expect(CONTACT_WHATSAPP_LABEL).toBe("+971 50 912 0374");
+    expect(CONTACT_WHATSAPP_HREF).toBe("https://wa.me/971509120374");
   });
 
   it("puts a live overlay price on product JSON-LD and keeps Paddock off the cart", () => {

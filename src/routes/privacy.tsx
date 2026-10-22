@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { GuideLayout } from "@/components/site/PageChrome";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
-import { BRAND, PATHS } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/privacy")({
   head: () =>
@@ -56,8 +56,8 @@ function PrivacyPage() {
           <h2 className="display text-3xl text-foreground">How to reach us</h2>
           <p className="mt-4">
             Email{" "}
-            <a href="mailto:info@zk-sports.com" className="text-foreground underline-offset-4 hover:underline">
-              info@zk-sports.com
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline-offset-4 hover:underline">
+              {CONTACT_EMAIL}
             </a>{" "}
             to update or delete an enquiry, or to opt out of further marketing about this event.
           </p>

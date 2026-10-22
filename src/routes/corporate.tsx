@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { GuideLayout } from "@/components/site/PageChrome";
 import { EVENT } from "@/lib/packages";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
-import { BRAND, PATHS } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/corporate")({
   head: () =>
@@ -43,7 +43,7 @@ function CorporatePage() {
         <section>
           <h2 className="display text-4xl">How a booking works</h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            Listed packages can be paid on the package page. For a private area, mixed inventory or Paddock Club variants, email info@zk-sports.com with the date and headcount — we come back with what is left and a written inclusion list.
+            Listed packages can be paid on the package page. For a private area, mixed inventory or Paddock Club variants, email {CONTACT_EMAIL} with the date and headcount — we come back with what is left and a written inclusion list.
           </p>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
             {BRAND.credentials} Tickets are issued digitally by the promoter closer to race week.

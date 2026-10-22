@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { EVENT, PACKAGES } from "@/lib/packages";
-import { BRAND, PATHS } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, PATHS } from "@/lib/site";
 import { CredentialBadges } from "@/components/site/CredentialBadges";
 
 const LOGO_SRC = "/ZK%20white%20logo.png";
@@ -206,10 +206,10 @@ export function Footer() {
           <div className="font-mono text-muted-foreground">Race {EVENT.dates}</div>
           <div className="text-xs text-muted-foreground">Fanzone from {EVENT.fanOpens}</div>
           <a
-            href="mailto:info@zk-sports.com?subject=Abu%20Dhabi%20Grand%20Prix%202026"
+            href={`mailto:${CONTACT_EMAIL}?subject=Abu%20Dhabi%20Grand%20Prix%202026`}
             className="mt-4 block hover:text-primary"
           >
-            info@zk-sports.com
+            {CONTACT_EMAIL}
           </a>
           <a href={BRAND.parentUrl} className="block hover:text-primary">zk-sports.com</a>
           <p className="text-xs text-muted-foreground">

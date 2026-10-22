@@ -1,6 +1,4 @@
-export const CONTACT_EMAIL = "info@zk-sports.com";
-export const CONTACT_WHATSAPP_LABEL = "+971 55 608 9074";
-export const CONTACT_WHATSAPP_HREF = "https://wa.me/971556089074";
+import { CONTACT_EMAIL, CONTACT_WHATSAPP_HREF, CONTACT_WHATSAPP_LABEL } from "@/lib/site";
 
 export function ContactUs({ compact = false }: { compact?: boolean }) {
   return (

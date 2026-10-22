@@ -4,7 +4,7 @@ import { CredentialBadges } from "@/components/site/CredentialBadges";
 import { GuideLayout } from "@/components/site/PageChrome";
 import { EVENT } from "@/lib/packages";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
-import { BRAND, PATHS } from "@/lib/site";
+import { BRAND, CONTACT_EMAIL, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/official-access")({
   head: () =>
@@ -61,8 +61,8 @@ function OfficialAccessPage() {
             <h2 className="display text-4xl">Name and contact</h2>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
               Legal and trading name: {BRAND.legalName}. Enquiries:{" "}
-              <a href="mailto:info@zk-sports.com" className="text-foreground underline-offset-4 hover:underline">
-                info@zk-sports.com
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline-offset-4 hover:underline">
+                {CONTACT_EMAIL}
               </a>
               . Consultants reply within {BRAND.responseTime}.
             </p>

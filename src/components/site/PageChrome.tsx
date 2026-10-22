@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
 import type { GuidePage } from "@/lib/content";
-import { PATHS } from "@/lib/site";
+import { CONTACT_EMAIL, PATHS } from "@/lib/site";
 
 export type Crumb = {
   label: string;
@@ -42,7 +42,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
 
 export function EnquireBand({
   title = "Book your seats",
-  body = "Choose a package, pick the day and the number of guests, and pay securely online. Questions go to info@zk-sports.com or WhatsApp.",
+  body = `Choose a package, pick the day and the number of guests, and pay securely online. Questions go to ${CONTACT_EMAIL} or WhatsApp.`,
 }: {
   title?: string;
   body?: string;
