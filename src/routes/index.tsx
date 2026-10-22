@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
 import { CredentialBadges } from "@/components/site/CredentialBadges";
 import { CircuitMap } from "@/components/site/CircuitMap";
-import { formatMoney, loadCatalogOverlays, type PackageOverlay } from "@/lib/crm-catalog";
+import { formatMoney, type PackageOverlay } from "@/lib/crm-catalog";
+import { loadListingStorefront } from "@/lib/storefront";
 import { EVENT, PACKAGES, TIERS, type Pkg, type Tier } from "@/lib/packages";
 import { breadcrumbJsonLd, eventJsonLd, pageHead } from "@/lib/seo";
 import { BRAND, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
-  loader: async () => ({ overlays: Object.fromEntries(await loadCatalogOverlays()) }),
+  loader: async () => loadListingStorefront(),
   head: () =>
     pageHead({
       title: "Abu Dhabi Grand Prix 2026 hospitality & official tickets | ZK Sports & Entertainment",

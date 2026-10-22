@@ -4,8 +4,8 @@ import { FaqList } from "@/components/site/FaqList";
 import { Breadcrumbs } from "@/components/site/PageChrome";
 import { PackageMedia } from "@/components/site/PackageMedia";
 import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
-import { checkoutReady } from "@/lib/checkout";
-import { availabilityLabel, formatMoney, loadPackageOverlay } from "@/lib/crm-catalog";
+import { availabilityLabel, formatMoney, preferredDayPrice } from "@/lib/crm-catalog";
+import { loadPackageStorefront } from "@/lib/storefront";
 import { EVENT, getPackage, PACKAGES, relatedGuideFor, TIERS } from "@/lib/packages";
 import { breadcrumbJsonLd, faqJsonLd, pageHead, productJsonLd, videoJsonLd } from "@/lib/seo";
 import { BRAND, PATHS, packagePath } from "@/lib/site";
@@ -14,8 +14,8 @@ export const Route = createFileRoute("/packages/$slug")({
   loader: async ({ params }) => {
     const pkg = getPackage(params.slug);
     if (!pkg) throw notFound();
-    const overlay = await loadPackageOverlay(pkg.slug);
-    return { pkg, overlay, checkoutEnabled: checkoutReady() };
+    const storefront = await loadPackageStorefront({ data: { slug: pkg.slug } });
+    return { pkg, overlay: storefront.overlay, checkoutEnabled: storefront.checkoutEnabled };
   },
   head: ({ loaderData }) =>
     loaderData
@@ -60,8 +60,9 @@ function PackagePage() {
   const related = PACKAGES.filter((x) => x.slug !== p.slug && x.tier === p.tier)
     .concat(PACKAGES.filter((x) => x.tier !== p.tier))
     .slice(0, 3);
-  const availabilityText = overlay.fromPrice
-    ? `${formatMoney(overlay.fromPrice, overlay.currency)} · ${availabilityLabel(Math.max(...overlay.days.map((d) => d.sellable), 0), overlay.anyBuyable)}`
+  const heroPrice = preferredDayPrice(overlay);
+  const availabilityText = heroPrice
+    ? `${formatMoney(heroPrice.amount, heroPrice.currency)} · ${availabilityLabel(heroPrice.sellable, heroPrice.buyable)}`
     : overlay.anyBuyable
       ? availabilityLabel(Math.max(...overlay.days.map((d) => d.sellable), 0), true)
       : p.slug === "paddock-club"
@@ -254,7 +255,7 @@ function PackagePage() {
         <div className="min-w-0">
           <div className="truncate font-display text-lg font-bold uppercase">{p.name}</div>
           <div className="text-xs text-muted-foreground">
-            {overlay.fromPrice ? formatMoney(overlay.fromPrice, overlay.currency) : p.slug === "paddock-club" ? "Contact us" : "Limited allocation"}
+            {heroPrice ? formatMoney(heroPrice.amount, heroPrice.currency) : p.slug === "paddock-club" ? "Contact us" : "Limited allocation"}
           </div>
         </div>
         <a href="#enquire" className="shrink-0 bg-primary px-5 py-3 font-display font-bold uppercase text-primary-foreground">

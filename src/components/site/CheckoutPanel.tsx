@@ -88,6 +88,10 @@ export function CheckoutPanel({
                   window.location.href = result.url;
                   return;
                 }
+                if (checkoutEnabled) {
+                  setError("This package is arranged with a consultant. Email or WhatsApp us and we will confirm what is left.");
+                  return;
+                }
                 const result = await submitAvailabilityRequest({
                   data: {
                     slug: pkg.slug,

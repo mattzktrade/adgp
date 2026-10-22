@@ -16,18 +16,18 @@ const skybridgeFriday: CrmCatalogItem = {
 };
 
 describe("catalog overlay", () => {
-  it("picks the lowest buyable day as the from-price", () => {
+  it("uses the 3-day weekend as the from-price when that day is buyable", () => {
     const overlay = overlayForSlug(
       [
         skybridgeFriday,
+        { ...skybridgeFriday, day: "3-day weekend", unitPrice: 5500, packageId: "weekend" },
         { ...skybridgeFriday, day: "Sunday", unitPrice: 3500, packageId: "sun" },
-        { ...skybridgeFriday, slug: "paddock-club", day: "3-day weekend", buyable: false, reason: "contact" },
       ],
       "skybridge-terrace",
     );
-    expect(overlay.fromPrice).toBe(495);
+    expect(overlay.fromPrice).toBe(5500);
     expect(overlay.anyBuyable).toBe(true);
-    expect(overlay.days).toHaveLength(2);
+    expect(overlay.days).toHaveLength(3);
   });
 
   it("labels remaining seats without inventing a price", () => {

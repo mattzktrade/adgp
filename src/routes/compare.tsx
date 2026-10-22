@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { GuideLayout } from "@/components/site/PageChrome";
-import { formatMoney, loadCatalogOverlays } from "@/lib/crm-catalog";
+import { formatMoney } from "@/lib/crm-catalog";
+import { loadListingStorefront } from "@/lib/storefront";
 import { EVENT, PACKAGES, TIERS } from "@/lib/packages";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 import { BRAND, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/compare")({
-  loader: async () => ({ overlays: Object.fromEntries(await loadCatalogOverlays()) }),
+  loader: async () => loadListingStorefront(),
   head: () =>
     pageHead({
       title: `Compare Abu Dhabi GP 2026 hospitality | ${BRAND.shortName}`,

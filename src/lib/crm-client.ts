@@ -17,6 +17,10 @@ export function isCrmCatalogConfigured(): boolean {
   return Boolean(crmAdgpSecret());
 }
 
+export function isCheckoutReady(): boolean {
+  return isWebsiteCheckoutEnabled() && isCrmCatalogConfigured() && Boolean(process.env.STRIPE_SECRET_KEY?.trim());
+}
+
 export async function crmAdgpFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const secret = crmAdgpSecret();
   if (!secret) throw new Error("CRM_ADGP_SECRET is not set");

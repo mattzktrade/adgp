@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { crmAdgpFetch, isCrmCatalogConfigured, isWebsiteCheckoutEnabled, type CrmHold, type CrmOrderLookup } from "@/lib/crm-client";
+import { crmAdgpFetch, isCheckoutReady, isCrmCatalogConfigured, type CrmHold, type CrmOrderLookup } from "@/lib/crm-client";
 import { dayOptionsFor, getPackage } from "@/lib/packages";
 import { SITE_URL } from "@/lib/site";
 
@@ -19,7 +19,7 @@ function stripeSecret(): string {
 }
 
 export function checkoutReady(): boolean {
-  return isWebsiteCheckoutEnabled() && isCrmCatalogConfigured() && Boolean(stripeSecret());
+  return isCheckoutReady();
 }
 
 async function createStripeSession(input: {

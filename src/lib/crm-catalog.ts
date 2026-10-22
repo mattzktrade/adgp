@@ -21,6 +21,7 @@ export type PackageOverlay = {
 };
 
 const CACHE_MS = 30_000;
+const FETCH_MS = 8_000;
 let catalogCache: { at: number; items: CrmCatalogItem[] } | null = null;
 
 export function availabilityLabel(sellable: number, buyable: boolean): string {
@@ -38,21 +39,33 @@ export function formatMoney(amount: number, currency = "USD"): string {
   }
 }
 
+async function fetchCrmCatalogOnce(): Promise<CrmCatalogItem[]> {
+  const response = await crmAdgpFetch("/catalog", { signal: AbortSignal.timeout(FETCH_MS) });
+  if (!response.ok) {
+    throw new Error(`CRM catalog rejected ${response.status}`);
+  }
+  const body = (await response.json()) as { packages?: CrmCatalogItem[] };
+  return Array.isArray(body.packages) ? body.packages : [];
+}
+
 export async function fetchCrmCatalog(options?: { live?: boolean }): Promise<CrmCatalogItem[]> {
   if (!isCrmCatalogConfigured()) return [];
   const live = options?.live === true;
-  if (!live && catalogCache && Date.now() - catalogCache.at < CACHE_MS) {
+  if (!live && catalogCache && catalogCache.items.length > 0 && Date.now() - catalogCache.at < CACHE_MS) {
     return catalogCache.items;
   }
-  const response = await crmAdgpFetch("/catalog");
-  if (!response.ok) {
-    console.error("[catalog] CRM rejected catalog", response.status);
-    return catalogCache?.items ?? [];
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const items = await fetchCrmCatalogOnce();
+      if (items.length > 0) catalogCache = { at: Date.now(), items };
+      return items;
+    } catch (error) {
+      lastError = error;
+    }
   }
-  const body = (await response.json()) as { packages?: CrmCatalogItem[] };
-  const items = Array.isArray(body.packages) ? body.packages : [];
-  catalogCache = { at: Date.now(), items };
-  return items;
+  console.error("[catalog] CRM catalog failed", lastError);
+  return catalogCache?.items ?? [];
 }
 
 export function overlayForSlug(items: CrmCatalogItem[], slug: string): PackageOverlay {
@@ -70,11 +83,12 @@ export function overlayForSlug(items: CrmCatalogItem[], slug: string): PackageOv
       reason: item.reason,
     }));
   const priced = days.filter((day) => day.buyable && day.unitPrice > 0);
+  const weekend = priced.find((day) => day.day === "3-day weekend");
   return {
     slug,
     days,
-    fromPrice: priced.length ? Math.min(...priced.map((day) => day.unitPrice)) : null,
-    currency: priced[0]?.currency || days[0]?.currency || "USD",
+    fromPrice: weekend?.unitPrice ?? (priced.length ? Math.min(...priced.map((day) => day.unitPrice)) : null),
+    currency: weekend?.currency || priced[0]?.currency || days[0]?.currency || "USD",
     anyBuyable: priced.length > 0,
   };
 }
@@ -86,6 +100,14 @@ export async function loadPackageOverlay(slug: string, options?: { live?: boolea
     console.error("[catalog] overlay failed", error);
     return { slug, days: [], fromPrice: null, currency: "USD", anyBuyable: false };
   }
+}
+
+export function preferredDayPrice(overlay: PackageOverlay): { amount: number; currency: string; sellable: number; buyable: boolean } | null {
+  const preferred = overlay.days.find((day) => day.day === "3-day weekend" && day.buyable && day.unitPrice > 0);
+  const fallback = overlay.days.find((day) => day.buyable && day.unitPrice > 0);
+  const day = preferred ?? fallback;
+  if (!day) return null;
+  return { amount: day.unitPrice, currency: day.currency, sellable: day.sellable, buyable: day.buyable };
 }
 
 export async function loadCatalogOverlays(options?: { live?: boolean }): Promise<Map<string, PackageOverlay>> {
