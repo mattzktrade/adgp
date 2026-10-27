@@ -54,7 +54,7 @@ describe("SEO helpers", () => {
   it("keeps the brand entity stable", () => {
     expect(BRAND.legalName).toBe("ZK Sports & Entertainment");
     expect(BRAND.sameAs).toContain("https://www.zk-sports.com");
-    expect(CONTACT_EMAIL).toBe("contact@zk-sports.com");
+    expect(CONTACT_EMAIL).toBe("info@zk-sports.com");
     expect(CONTACT_WHATSAPP_LABEL).toBe("+971 50 912 0374");
     expect(CONTACT_WHATSAPP_HREF).toBe("https://wa.me/971509120374");
   });
