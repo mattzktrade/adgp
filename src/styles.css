@@ -42,6 +42,7 @@
 
 :root {
   --radius: 2px;
+  --nav-h: 4rem;
   /* Asphalt black, ZK race red, Abu Dhabi dusk sand */
   --background: oklch(0.13 0.006 270);
   --asphalt: oklch(0.17 0.007 270);
@@ -76,14 +77,24 @@
   --shadow-glow: 0 0 0 1px oklch(0.6171 0.2527 29.18 / 0.6), 0 0 40px -6px oklch(0.6171 0.2527 29.18 / 0.7);
 }
 
+@media (min-width: 768px) {
+  :root {
+    --nav-h: 5rem;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
   }
   html {
     scroll-behavior: smooth;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+    scroll-padding-top: calc(var(--nav-h) + 0.75rem);
   }
   body {
+    min-height: 100svh;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
@@ -102,6 +113,15 @@
   line-height: 0.86;
   letter-spacing: -0.01em;
   word-spacing: 0.06em;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+@utility page-offset {
+  padding-top: calc(var(--nav-h) + 2.5rem);
+  @media (min-width: 768px) {
+    padding-top: calc(var(--nav-h) + 3rem);
+  }
 }
 
 @utility eyebrow {
@@ -241,5 +261,17 @@
   .reveal {
     opacity: 1;
     transform: none;
+  }
+}
+
+@media (min-width: 768px) and (min-height: 820px) {
+  .hero-clock {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) and (min-height: 840px) {
+  .hero-scroll-cue {
+    display: flex;
   }
 }

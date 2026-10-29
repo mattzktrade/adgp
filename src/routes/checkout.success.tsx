@@ -93,11 +93,11 @@ function CheckoutSuccessPage() {
   const confirmed = state.status === "confirmed" && state.orderReference;
 
   return (
-    <div>
+    <div className="min-h-svh">
       <Nav solid />
-      <section className="mx-auto max-w-3xl px-5 py-28 md:px-10">
+      <section className="page-offset mx-auto max-w-3xl px-5 pb-28 md:px-10">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl text-primary-foreground">✓</div>
-        <h1 className="display mt-8 text-5xl md:text-7xl">{confirmed ? "Order confirmed" : state.status === "confirming" ? "Confirming your booking" : "Payment received"}</h1>
+        <h1 className="display mt-8 text-[clamp(2.25rem,6vw,4.5rem)]">{confirmed ? "Order confirmed" : state.status === "confirming" ? "Confirming your booking" : "Payment received"}</h1>
         {confirmed ? (
           <div className="mt-8 space-y-3 text-lg">
             <p className="text-muted-foreground">

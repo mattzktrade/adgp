@@ -54,9 +54,9 @@ describe("SEO helpers", () => {
   it("keeps the brand entity stable", () => {
     expect(BRAND.legalName).toBe("ZK Sports & Entertainment");
     expect(BRAND.sameAs).toContain("https://www.zk-sports.com");
-    expect(CONTACT_EMAIL).toBe("info@zk-sports.com");
-    expect(CONTACT_WHATSAPP_LABEL).toBe("+971 50 912 0374");
-    expect(CONTACT_WHATSAPP_HREF).toBe("https://wa.me/971509120374");
+    expect(CONTACT_EMAIL).toBe("samantha@zk-sports.com");
+    expect(CONTACT_WHATSAPP_LABEL).toBe("+971 55 608 9074");
+    expect(CONTACT_WHATSAPP_HREF).toBe("https://wa.me/971556089074");
   });
 
   it("puts a live overlay price on product JSON-LD and keeps Paddock off the cart", () => {

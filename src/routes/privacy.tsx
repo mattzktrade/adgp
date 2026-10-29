@@ -53,6 +53,21 @@ function PrivacyPage() {
           </p>
         </section>
         <section>
+          <h2 className="display text-3xl text-foreground">Cookies and ads</h2>
+          <p className="mt-4">
+            This site uses the Meta Pixel (Facebook and Instagram) so we can see which hospitality pages an advert sent
+            you to, and whether you then sent an enquiry or booked. Google Analytics may also run when it is configured.
+            These tools set cookies. They do not change what you see on the page. Meta’s policy is at{" "}
+            <a
+              href="https://www.facebook.com/privacy/policy/"
+              className="text-foreground underline-offset-4 hover:underline"
+            >
+              facebook.com/privacy/policy
+            </a>
+            . Email us if you do not want your visit used for advertising measurement.
+          </p>
+        </section>
+        <section>
           <h2 className="display text-3xl text-foreground">How to reach us</h2>
           <p className="mt-4">
             Email{" "}

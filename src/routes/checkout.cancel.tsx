@@ -22,10 +22,10 @@ export const Route = createFileRoute("/checkout/cancel")({
 function CheckoutCancelPage() {
   const { slug } = Route.useSearch();
   return (
-    <div>
+    <div className="min-h-svh">
       <Nav solid />
-      <section className="mx-auto max-w-3xl px-5 py-28 md:px-10">
-        <h1 className="display text-5xl md:text-7xl">Checkout cancelled</h1>
+      <section className="page-offset mx-auto max-w-3xl px-5 pb-28 md:px-10">
+        <h1 className="display text-[clamp(2.25rem,6vw,4.5rem)]">Checkout cancelled</h1>
         <p className="mt-6 text-lg text-muted-foreground">
           No payment was taken. Those seats are released again. You can go back and choose another day, or message us if you have a question.
         </p>

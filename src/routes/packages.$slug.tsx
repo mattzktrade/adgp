@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { CheckoutPanel } from "@/components/site/CheckoutPanel";
 import { FaqList } from "@/components/site/FaqList";
 import { Breadcrumbs } from "@/components/site/PageChrome";
 import { PackageMedia } from "@/components/site/PackageMedia";
 import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
+import { trackViewContent } from "@/lib/analytics";
 import { availabilityLabel, formatMoney, preferredDayPrice } from "@/lib/crm-catalog";
 import { loadPackageStorefront } from "@/lib/storefront";
 import { EVENT, getPackage, PACKAGES, relatedGuideFor, TIERS } from "@/lib/packages";
@@ -61,6 +63,15 @@ function PackagePage() {
     .concat(PACKAGES.filter((x) => x.tier !== p.tier))
     .slice(0, 3);
   const heroPrice = preferredDayPrice(overlay);
+  useEffect(() => {
+    trackViewContent({
+      contentName: p.name,
+      contentId: p.slug,
+      contentCategory: TIERS[p.tier].label,
+      value: heroPrice?.amount,
+      currency: heroPrice?.currency,
+    });
+  }, [p.name, p.slug, p.tier, heroPrice?.amount, heroPrice?.currency]);
   const availabilityText = heroPrice
     ? `${formatMoney(heroPrice.amount, heroPrice.currency)} · ${availabilityLabel(heroPrice.sellable, heroPrice.buyable)}`
     : overlay.anyBuyable
@@ -70,27 +81,29 @@ function PackagePage() {
         : "Limited allocation";
 
   return (
-    <div className="pb-20 md:pb-0">
+    <div className="min-h-svh pb-20 md:pb-0">
       <Nav solid />
 
-      <section className="relative flex min-h-[82svh] items-end overflow-hidden pt-20">
-        {p.video ? (
-          <video
-            className="absolute inset-0 h-full w-full scale-105 object-cover"
-            src={p.video}
-            poster={p.image}
-            autoPlay
-            muted
-            loop
-            playsInline
-            aria-label={`${p.name} at ${EVENT.circuit}`}
-          />
-        ) : (
-          <img src={p.image} alt={`${p.name} at ${EVENT.circuit}`} className="absolute inset-0 h-full w-full scale-105 object-cover" />
-        )}
-        <div className="veil absolute inset-0" />
-        <div className="veil-side absolute inset-0" />
-        <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-12 md:px-10 md:pb-16">
+      <section className="relative flex min-h-svh flex-col justify-end">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {p.video ? (
+            <video
+              className="absolute inset-0 h-full w-full scale-105 object-cover"
+              src={p.video}
+              poster={p.image}
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-label={`${p.name} at ${EVENT.circuit}`}
+            />
+          ) : (
+            <img src={p.image} alt={`${p.name} at ${EVENT.circuit}`} className="absolute inset-0 h-full w-full scale-105 object-cover" />
+          )}
+          <div className="veil absolute inset-0" />
+          <div className="veil-side absolute inset-0" />
+        </div>
+        <div className="relative mx-auto w-full min-w-0 max-w-[1600px] px-5 pb-12 pt-[calc(var(--nav-h)+1.5rem)] md:px-10 md:pb-16">
           <div className="mb-8 hidden md:block">
             <Breadcrumbs
               items={[
@@ -101,7 +114,7 @@ function PackagePage() {
             />
           </div>
           <Eyebrow>{TIERS[p.tier].label}</Eyebrow>
-          <h1 className="display mt-4 max-w-5xl text-[3.4rem] leading-[0.88] md:text-[7.5rem]">{p.name}</h1>
+          <h1 className="display mt-4 max-w-5xl text-[clamp(2.5rem,8vw,6.5rem)] leading-[0.88]">{p.name}</h1>
           <p className="mt-6 max-w-2xl text-lg text-foreground/85 md:text-xl">{p.lead}</p>
           <div className="mt-10 grid max-w-4xl grid-cols-2 border-t border-foreground/15 md:grid-cols-4">
             {[
@@ -119,11 +132,11 @@ function PackagePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1600px] gap-14 px-5 py-20 md:px-10 lg:grid-cols-[1fr_420px] lg:gap-20 lg:py-28">
+      <section className="mx-auto grid max-w-[1600px] gap-14 px-5 py-20 md:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,420px)] lg:gap-20 lg:py-28">
         <div className="min-w-0">
           <Reveal>
             <Eyebrow>Overview</Eyebrow>
-            <h2 className="display mt-5 text-4xl md:text-6xl">{p.headline}</h2>
+            <h2 className="display mt-5 text-[clamp(1.85rem,4vw,3.75rem)]">{p.headline}</h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">{p.description}</p>
             <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
               Best for {p.bestFor.charAt(0).toLowerCase() + p.bestFor.slice(1)}. {p.daysLabel}. {BRAND.credentials}
@@ -206,7 +219,7 @@ function PackagePage() {
         <div className="mx-auto grid max-w-[1600px] gap-12 px-5 py-20 md:px-10 lg:grid-cols-[1fr_1.4fr] lg:py-28">
           <div>
             <Eyebrow>Good to know</Eyebrow>
-            <h2 className="display mt-5 text-4xl md:text-6xl">Questions about {p.name}</h2>
+            <h2 className="display mt-5 text-[clamp(1.85rem,4vw,3.75rem)]">Questions about {p.name}</h2>
             <p className="mt-4 text-muted-foreground">
               Ticket delivery, groups, hotels and dress code sit on the{" "}
               <Link to={PATHS.faq} className="text-foreground underline-offset-4 hover:underline">
@@ -223,7 +236,7 @@ function PackagePage() {
         <div className="flex items-end justify-between gap-6">
           <div>
             <Eyebrow>Also at Yas Marina</Eyebrow>
-            <h2 className="display mt-5 text-4xl md:text-6xl">Compare experiences</h2>
+            <h2 className="display mt-5 text-[clamp(1.85rem,4vw,3.75rem)]">Compare experiences</h2>
           </div>
           <Link to={PATHS.compare} className="eyebrow hidden text-muted-foreground hover:text-foreground md:block">
             View all →

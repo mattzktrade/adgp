@@ -28,7 +28,7 @@ const CREDENTIALS_STILL = encodeURI("/west grandstand/ADGP_Web_West_Grandstand_1
 function Index() {
   const { overlays } = Route.useLoaderData();
   return (
-    <div className="relative">
+    <div className="relative min-h-svh">
       <Nav />
       <Hero />
       <Ticker />
@@ -53,27 +53,29 @@ function Hero() {
     return () => clearInterval(i);
   }, []);
   return (
-    <section className="grain relative isolate overflow-hidden md:h-[100svh] md:min-h-[720px]">
-      <img src={HERO_STILL} alt={BRAND.defaultOgAlt} className="absolute inset-0 h-full w-full scale-105 object-cover object-[72%_center] md:object-center" />
-      <div className="veil absolute inset-0" />
-      <div className="veil-side absolute inset-0" />
-      <div className="scanlines absolute inset-0 opacity-60" />
+    <section className="grain relative isolate">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <img src={HERO_STILL} alt={BRAND.defaultOgAlt} className="absolute inset-0 h-full w-full scale-105 object-cover object-[72%_center] md:object-center" />
+        <div className="veil absolute inset-0" />
+        <div className="veil-side absolute inset-0" />
+        <div className="scanlines absolute inset-0 opacity-60" />
+      </div>
 
-      <div className="pointer-events-none absolute inset-x-5 top-24 hidden justify-end font-mono text-[11px] text-muted-foreground md:inset-x-10 md:flex">
+      <div className="hero-clock pointer-events-none absolute inset-x-5 top-[calc(var(--nav-h)+0.75rem)] hidden justify-end font-mono text-[11px] text-muted-foreground md:inset-x-10">
         <span>
           YAS ISLAND <span className="text-foreground">{time || "--:--:--"}</span> GST
         </span>
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-col px-5 pb-16 pt-[5.75rem] md:h-full md:justify-end md:px-10 md:pb-32 md:pt-28">
+      <div className="relative z-10 mx-auto flex min-h-svh w-full min-w-0 max-w-[1600px] flex-col justify-end px-5 pb-16 pt-[calc(var(--nav-h)+1.5rem)] md:px-10 md:pb-24">
         <Eyebrow className="animate-rise max-w-full">Formula 1® · Season Finale · Round 24</Eyebrow>
-        <h1 className="display mt-5 text-7xl leading-[0.86] md:mt-6 md:text-[8.2vw] xl:text-[7.75rem]">
+        <h1 className="display mt-5 text-[clamp(2.6rem,12vw,4.5rem)] leading-[0.86] md:mt-6 md:text-[clamp(3.25rem,7vw,7.75rem)]">
           <span className="block animate-wipe">Abu Dhabi</span>
           <span className="block animate-wipe [animation-delay:150ms]">Grand Prix</span>
           <span className="block animate-wipe text-sand [animation-delay:300ms]">2026</span>
         </h1>
-        <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[1fr_auto] md:items-end">
-          <div className="max-w-xl animate-rise [animation-delay:400ms]">
+        <div className="mt-8 grid gap-8 md:mt-10 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="min-w-0 max-w-xl animate-rise [animation-delay:400ms]">
             <p className="text-base leading-relaxed text-foreground/85 md:hidden">
               Official hospitality and tickets at {EVENT.circuit}, {EVENT.raceWeekend}. Paddock Club™, ZK lounges and grandstands from an authorised onseller.
             </p>
@@ -102,7 +104,7 @@ function Hero() {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 eyebrow text-muted-foreground md:flex">
+      <div className="hero-scroll-cue pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 eyebrow text-muted-foreground">
         Scroll
         <span className="h-10 w-px bg-gradient-to-b from-foreground to-transparent" />
       </div>
@@ -140,7 +142,7 @@ function Race() {
         <div className="md:col-span-5">
           <Reveal>
             <Eyebrow>The Race</Eyebrow>
-            <h2 className="display mt-6 text-6xl md:text-8xl">
+            <h2 className="display mt-6 text-[clamp(2.5rem,6vw,6rem)]">
               Day into <br />
               <span className="text-sand">night.</span>
             </h2>
@@ -160,7 +162,7 @@ function Race() {
       <div className="relative mx-auto mt-20 grid max-w-[1600px] grid-cols-2 border-t border-border px-5 md:mt-28 md:grid-cols-4 md:px-10">
         {STATS.map(([n, l], i) => (
           <Reveal key={l} delay={i * 80} className="border-b border-border py-8 pr-4 md:border-b-0 md:border-r md:py-10 md:pl-6 md:last:border-r-0 md:first:pl-0">
-            <div className="display text-6xl md:text-8xl">{n}</div>
+            <div className="display text-[clamp(2.5rem,6vw,6rem)]">{n}</div>
             <div className="eyebrow mt-3 text-muted-foreground">{l}</div>
           </Reveal>
         ))}
@@ -177,7 +179,7 @@ function CircuitExplorer() {
         <Reveal className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <Eyebrow>The Circuit</Eyebrow>
-            <h2 className="display mt-6 text-6xl md:text-8xl">
+            <h2 className="display mt-6 text-[clamp(2.5rem,6vw,6rem)]">
               One circuit. <br />
               Ten <span className="text-primary">locations.</span>
             </h2>
@@ -217,7 +219,7 @@ function CircuitExplorer() {
               <div className="absolute right-0 top-0 bg-primary px-3 py-2 font-mono text-sm text-primary-foreground">{sel.id}</div>
             </div>
             <div className="flex flex-1 flex-col p-6">
-              <h3 className="display text-5xl">{sel.name}</h3>
+              <h3 className="display text-[clamp(2.25rem,4vw,3rem)]">{sel.name}</h3>
               <div className="eyebrow mt-2 text-sand">{sel.where}</div>
               <p className="mt-4 text-muted-foreground">{sel.sub}</p>
               <div className="mt-5 grid grid-cols-2 gap-px bg-border">
@@ -252,7 +254,7 @@ function Collection({ overlays }: { overlays: Record<string, PackageOverlay> }) 
         <Reveal className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <div>
             <Eyebrow>Hospitality Collection</Eyebrow>
-            <h2 className="display mt-6 text-6xl md:text-8xl">
+            <h2 className="display mt-6 text-[clamp(2.5rem,6vw,6rem)]">
               Choose your <span className="text-sand">package.</span>
             </h2>
           </div>
@@ -317,7 +319,7 @@ function PackageRow({ p, overlay }: { p: Pkg; overlay?: PackageOverlay }) {
       <div className="aspect-[16/9] overflow-hidden md:hidden">
         <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover" />
       </div>
-      <h3 className="display text-4xl leading-none transition-transform duration-500 group-hover:translate-x-3 md:whitespace-nowrap md:text-[clamp(2rem,2.5vw,3.25rem)]">
+      <h3 className="display text-4xl leading-none transition-transform duration-500 group-hover:translate-x-3 lg:whitespace-nowrap md:text-[clamp(1.75rem,2.4vw,3.25rem)]">
         {p.slug === "paddock-club" ? "Paddock Club" : p.name}
       </h3>
       <div className="min-w-0 text-sm leading-5 text-muted-foreground md:min-h-[2.875rem] md:pt-1.5 md:line-clamp-2">
@@ -353,7 +355,7 @@ function Credentials() {
       <div className="relative mx-auto grid max-w-[1600px] gap-12 px-5 py-24 md:grid-cols-2 md:px-10 md:py-36">
         <Reveal>
           <Eyebrow>Official access</Eyebrow>
-          <h2 className="display mt-6 text-6xl md:text-8xl">
+          <h2 className="display mt-6 text-[clamp(2.5rem,6vw,6rem)]">
             Let's go <span className="text-primary">official.</span>
           </h2>
         </Reveal>

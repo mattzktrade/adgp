@@ -115,13 +115,44 @@ Skip Step 1’s Vercel domain screen. In Lovable: **Project → Settings → Dom
 - [ ] `CRM_LEAD_WEBHOOK_SECRET` present
 - [ ] `VITE_GA_MEASUREMENT_ID` when GA4 exists
 
-## Search Console and Bing
+## Search Console (you already have ZK Sports)
 
-1. Add a **Domain** property for `zk-sports.com` (covers the subdomain).
-2. Verify DNS, then submit `https://abudhabi.zk-sports.com/sitemap.xml`.
-3. Leave **Settings → Search generative AI** on **Include**. Excluding the property hides you from AI Overviews and AI Mode.
-4. Use the Generative AI performance report plus the classic query report.
-5. Add the same origin in Bing Webmaster Tools (Bing AI Performance).
+Open [search.google.com/search-console](https://search.google.com/search-console). Click the property name at the top left.
+
+**If it says `zk-sports.com` with no https** — that is a Domain property. It already includes the new subdomain. Skip adding a property. Go to Submit the sitemap.
+
+**If it says `https://www.zk-sports.com` or `https://zk-sports.com`** — that is only the Wix shop. Add the new site:
+
+1. Property dropdown → **+ Add property**
+2. Choose **URL prefix**
+3. Paste `https://abudhabi.zk-sports.com` and continue
+4. Verify. Easiest: **HTML file** — download Google’s file, put it in this project’s `public` folder, push/redeploy, then click Verify. Or use **DNS TXT** in the same Wix DNS screen as the subdomain (host `@` or as Google shows, value pasted from Search Console).
+
+### Submit the sitemap
+
+1. Open the property that covers the new site
+2. Left menu → **Sitemaps**
+3. Paste: `https://abudhabi.zk-sports.com/sitemap.xml`
+4. **Submit**
+5. Status should become **Success** (can take a few hours)
+
+### Keep AI search on
+
+1. Left menu → **Settings → Search generative AI**
+2. Choose **Include my site’s links and content…**
+3. Do not choose Exclude
+
+Optional later: **URL Inspection** → paste `https://abudhabi.zk-sports.com/` → **Request indexing**.
+
+## Bing (easiest via Google)
+
+1. Open [bing.com/webmasters](https://www.bing.com/webmasters) and sign in (Microsoft or Google)
+2. **Add a site** → **Import from Google Search Console**
+3. Allow access, tick the ZK Sports property (and the new URL-prefix one if you created it)
+4. **Import** — Bing copies verification and sitemaps
+5. Open the site in Bing → **Sitemaps**. If `https://abudhabi.zk-sports.com/sitemap.xml` is missing, submit it there too
+
+If import is not offered: **Add a site**, enter `https://abudhabi.zk-sports.com`, verify with DNS TXT or an HTML file in `public`, then submit the same sitemap.
 
 ## Wix / zk-sports.com (this is the equity)
 

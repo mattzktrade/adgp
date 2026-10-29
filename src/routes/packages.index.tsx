@@ -28,13 +28,13 @@ export const Route = createFileRoute("/packages/")({
 function PackagesIndex() {
   const { overlays } = Route.useLoaderData();
   return (
-    <div>
+    <div className="min-h-svh">
       <Nav solid />
       <header className="border-b border-border">
-        <div className="mx-auto max-w-[1600px] px-5 pb-14 pt-28 md:px-10 md:pb-20 md:pt-32">
+        <div className="page-offset mx-auto max-w-[1600px] px-5 pb-14 md:px-10 md:pb-20">
           <Breadcrumbs items={[{ label: "Abu Dhabi 2026", to: "/" }, { label: "Packages" }]} />
           <Eyebrow className="mt-8">Hospitality collection</Eyebrow>
-          <h1 className="display mt-5 max-w-5xl text-5xl md:text-8xl">Abu Dhabi GP 2026 packages</h1>
+          <h1 className="display mt-5 max-w-5xl text-[clamp(2.35rem,6.5vw,5.5rem)]">Abu Dhabi GP 2026 packages</h1>
           <p className="mt-8 max-w-3xl text-lg leading-relaxed text-foreground/85 md:text-xl">
             {BRAND.legalName} sells ten ways to watch the {EVENT.name} at {EVENT.circuit}. Race weekend {EVENT.raceWeekend}.
             Three ZK-hosted lounges, official hospitality including F1® Paddock Club™, and three grandstands. Live
@@ -49,11 +49,11 @@ function PackagesIndex() {
               key={pkg.slug}
               to="/packages/$slug"
               params={{ slug: pkg.slug }}
-              className="grid gap-4 py-8 md:grid-cols-[88px_1.2fr_1fr_auto] md:items-center md:gap-8"
+              className="grid gap-4 py-8 md:grid-cols-[88px_minmax(0,1.2fr)_minmax(0,1fr)_auto] md:items-center md:gap-8"
             >
               <span className="font-mono text-sm text-primary">{pkg.id}</span>
               <div>
-                <h2 className="display text-4xl md:text-6xl">{pkg.name}</h2>
+                <h2 className="display text-[clamp(1.75rem,4vw,3.75rem)]">{pkg.name}</h2>
                 <p className="mt-2 text-muted-foreground">{pkg.lead}</p>
               </div>
               <div className="text-sm text-muted-foreground">

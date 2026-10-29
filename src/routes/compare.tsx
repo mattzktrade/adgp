@@ -33,8 +33,8 @@ function ComparePage() {
       lead={`The ten packages ZK Sports & Entertainment sells for the ${EVENT.name} differ by view, format and days. Paddock Club is official pit-lane hospitality. Skybridge is the only venue built over the track. Grandstands are seats. This table is the short version; each name opens the full page.`}
       crumbs={[{ label: "Abu Dhabi 2026", to: "/" }, { label: "Compare" }]}
     >
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[980px] text-left text-sm">
+      <div className="overflow-x-auto overscroll-x-contain">
+        <table className="w-full min-w-[720px] text-left text-sm md:min-w-[980px]">
           <caption className="sr-only">Comparison of ten Abu Dhabi Grand Prix 2026 packages</caption>
           <thead>
             <tr className="eyebrow text-muted-foreground">

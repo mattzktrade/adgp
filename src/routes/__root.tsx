@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -11,7 +12,13 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { GA_MEASUREMENT_ID } from "../lib/analytics";
+import {
+  GA_MEASUREMENT_ID,
+  META_PIXEL_ID,
+  metaPixelBootstrapScript,
+  metaPixelNoscriptSrc,
+  trackPageView,
+} from "../lib/analytics";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { organizationJsonLd, plainMeta, websiteJsonLd } from "../lib/seo";
 import { BRAND } from "../lib/site";
@@ -114,6 +121,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         type: "application/ld+json",
         children: JSON.stringify(websiteJsonLd()),
       },
+      {
+        children: metaPixelBootstrapScript(META_PIXEL_ID),
+      },
       ...(GA_MEASUREMENT_ID
         ? [
             {
@@ -134,12 +144,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const noscriptSrc = metaPixelNoscriptSrc(META_PIXEL_ID);
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
+        {noscriptSrc ? (
+          <noscript>
+            <img height={1} width={1} style={{ display: "none" }} src={noscriptSrc} alt="" />
+          </noscript>
+        ) : null}
         {children}
         <Scripts />
       </body>
@@ -147,11 +163,20 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function MetaPixelPageViews() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  useEffect(() => {
+    trackPageView();
+  }, [pathname]);
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <MetaPixelPageViews />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

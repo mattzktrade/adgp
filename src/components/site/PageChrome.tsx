@@ -52,7 +52,7 @@ export function EnquireBand({
       <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-16 md:flex-row md:items-end md:justify-between md:px-10 md:py-24">
         <div className="max-w-xl">
           <Eyebrow>Next step</Eyebrow>
-          <h2 className="display mt-4 text-4xl md:text-6xl">{title}</h2>
+          <h2 className="display mt-4 text-[clamp(2rem,4.5vw,3.75rem)]">{title}</h2>
           <p className="mt-4 text-muted-foreground">{body}</p>
         </div>
         <Link
@@ -80,13 +80,13 @@ export function GuideLayout({
   children: ReactNode;
 }) {
   return (
-    <div>
+    <div className="min-h-svh">
       <Nav solid />
       <header className="border-b border-border">
-        <div className="mx-auto max-w-[1600px] px-5 pb-14 pt-28 md:px-10 md:pb-20 md:pt-32">
+        <div className="page-offset mx-auto max-w-[1600px] px-5 pb-14 md:px-10 md:pb-20">
           <Breadcrumbs items={crumbs} />
           <Eyebrow className="mt-8">{eyebrow}</Eyebrow>
-          <h1 className="display mt-5 max-w-5xl text-5xl md:text-8xl">{title}</h1>
+          <h1 className="display mt-5 max-w-5xl text-[clamp(2.35rem,6.5vw,5.5rem)]">{title}</h1>
           <p className="mt-8 max-w-3xl text-lg leading-relaxed text-foreground/85 md:text-xl">{lead}</p>
         </div>
       </header>

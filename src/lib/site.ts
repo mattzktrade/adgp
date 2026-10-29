@@ -20,9 +20,9 @@ export const BRAND = {
   sameAs: ["https://www.zk-sports.com", "https://www.yasmarinacircuit.com/en/onsellers"],
 } as const;
 
-export const CONTACT_EMAIL = "info@zk-sports.com";
-export const CONTACT_WHATSAPP_LABEL = "+971 50 912 0374";
-export const CONTACT_WHATSAPP_HREF = "https://wa.me/971509120374";
+export const CONTACT_EMAIL = "samantha@zk-sports.com";
+export const CONTACT_WHATSAPP_LABEL = "+971 55 608 9074";
+export const CONTACT_WHATSAPP_HREF = "https://wa.me/971556089074";
 
 export const PATHS = {
   home: "/",

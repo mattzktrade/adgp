@@ -29,7 +29,7 @@ function GuidesIndex() {
       lead={GUIDE_HUB_LEAD}
       crumbs={[{ label: "Abu Dhabi 2026", to: "/" }, { label: "Guides" }]}
     >
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
         {GUIDES.map((guide) => (
           <Link key={guide.path} to={guide.path} className="group block border border-border">
             <img src={guide.image} alt={guide.imageAlt} className="aspect-[16/10] w-full object-cover" />

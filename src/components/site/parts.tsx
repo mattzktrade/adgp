@@ -35,22 +35,22 @@ export function Nav({ solid = false }: { solid?: boolean }) {
   const filled = solid || scrolled || open;
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 overflow-x-hidden transition-all duration-500 ${
-        filled ? "border-b border-border bg-background/80 backdrop-blur-xl" : ""
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
+        filled ? "border-b border-border bg-background/95 backdrop-blur-xl" : ""
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-5 md:h-20 md:px-10">
-        <Link to="/" aria-label="ZK Sports & Entertainment home" className="min-w-0" onClick={() => setOpen(false)}>
+        <Link to="/" aria-label="ZK Sports & Entertainment home" className="min-w-0 shrink-0" onClick={() => setOpen(false)}>
           <Logo className="h-8 w-auto md:h-9" />
         </Link>
-        <nav className="hidden items-center gap-8 eyebrow text-muted-foreground lg:flex">
+        <nav className="hidden min-w-0 items-center gap-5 eyebrow tracking-[0.16em] text-muted-foreground xl:gap-8 lg:flex">
           {NAV_LINKS.map((link) => (
-            <Link key={link.to} to={link.to} className="transition-colors hover:text-foreground">
+            <Link key={link.to} to={link.to} className="shrink-0 transition-colors hover:text-foreground">
               {link.label}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Link
             to={PATHS.packages}
             className="chevron-btn shrink-0 whitespace-nowrap bg-primary px-4 py-2 pr-6 font-display text-sm font-bold uppercase tracking-wider text-primary-foreground transition-transform hover:translate-x-0.5 md:px-5 md:py-2.5 md:pr-7 md:text-base"
@@ -71,7 +71,10 @@ export function Nav({ solid = false }: { solid?: boolean }) {
         </div>
       </div>
       {open ? (
-        <nav id="mobile-nav" className="border-t border-border bg-background px-5 py-6 lg:hidden">
+        <nav
+          id="mobile-nav"
+          className="max-h-[calc(100svh-var(--nav-h))] overflow-y-auto border-t border-border bg-background px-5 py-6 lg:hidden"
+        >
           <div className="flex flex-col gap-4 font-display text-2xl font-bold uppercase">
             {NAV_LINKS.map((link) => (
               <Link key={link.to} to={link.to} onClick={() => setOpen(false)}>
@@ -169,17 +172,17 @@ export function Eyebrow({ children, className = "" }: { children: ReactNode; cla
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-border bg-background">
+    <footer className="relative z-[60] border-t border-border bg-background">
       <div className="kerb h-1.5 w-full" />
-      <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-14 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] md:px-10">
-        <div>
+      <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-14 md:grid-cols-2 xl:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))] md:px-10">
+        <div className="min-w-0">
           <Logo className="h-10" />
           <p className="mt-6 max-w-sm text-sm text-muted-foreground">
             {BRAND.legalName} is a Formula 1® Paddock Club™ Authorised Distributor and Yas Marina Circuit Official On-Seller.
           </p>
           <CredentialBadges variant="compact" className="mt-7" />
         </div>
-        <div className="space-y-2 text-sm">
+        <div className="min-w-0 space-y-2 text-sm">
           <div className="eyebrow mb-4 text-muted-foreground">Packages</div>
           {PACKAGES.map((pkg) => (
             <Link key={pkg.slug} to="/packages/$slug" params={{ slug: pkg.slug }} className="block hover:text-primary">
@@ -187,7 +190,7 @@ export function Footer() {
             </Link>
           ))}
         </div>
-        <div className="space-y-2 text-sm">
+        <div className="min-w-0 space-y-2 text-sm">
           <div className="eyebrow mb-4 text-muted-foreground">Explore</div>
           <Link to={PATHS.compare} className="block hover:text-primary">Compare hospitality</Link>
           <Link to={PATHS.guides} className="block hover:text-primary">Guides</Link>
@@ -199,7 +202,7 @@ export function Footer() {
           <Link to={PATHS.faq} className="block hover:text-primary">FAQ</Link>
           <Link to={PATHS.privacy} className="block hover:text-primary">Privacy</Link>
         </div>
-        <div className="space-y-2 text-sm">
+        <div className="min-w-0 space-y-2 text-sm">
           <div className="eyebrow mb-4 text-muted-foreground">Event</div>
           <div>{EVENT.name}</div>
           <div className="text-muted-foreground">{EVENT.circuit}</div>

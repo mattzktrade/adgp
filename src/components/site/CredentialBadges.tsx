@@ -10,7 +10,7 @@ export function CredentialBadges({
 }) {
   const compact = variant === "compact";
   return (
-    <div className={`flex flex-row flex-nowrap items-center gap-5 md:gap-8 ${className}`}>
+    <div className={`flex flex-row flex-wrap items-center gap-5 md:gap-8 ${className}`}>
       <img
         src={PADDOCK_BADGE}
         alt="Formula 1 Paddock Club — Authorised Distributor"

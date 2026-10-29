@@ -47,7 +47,7 @@ function FaqPage() {
         <FaqList faqs={SHARED_FAQS} />
       </div>
       <div className="mt-20">
-        <h2 className="display text-4xl md:text-6xl">From the team</h2>
+        <h2 className="display text-[clamp(1.85rem,4vw,3.75rem)]">From the team</h2>
         <div className="mt-10 grid gap-6 sm:grid-cols-3">
           {FAQ_CLIPS.map((clip) => (
             <figure key={clip.src}>
