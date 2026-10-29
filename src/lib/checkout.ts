@@ -3,8 +3,27 @@ import { z } from "zod";
 
 import { crmAdgpFetch, isCheckoutReady, isCrmCatalogConfigured, type CrmHold, type CrmOrderLookup } from "@/lib/crm-client";
 import { dayOptionsFor, getPackage } from "@/lib/packages";
+import { takeRateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site";
 import { fulfillCheckoutSession } from "@/lib/stripe-webhook";
+
+const sessionIdInput = z.object({
+  sessionId: z
+    .string()
+    .trim()
+    .regex(/^cs_(test|live)_[A-Za-z0-9]{10,200}$/),
+});
+
+const PUBLIC_ORDER_FIELDS = ["orderReference", "dealReference", "packageName", "day", "guests", "totalAmount", "currency"] as const;
+
+/** Only these fields reach the browser, whatever else the CRM adds to its response. */
+function publicOrder(body: CrmOrderLookup): Omit<CrmOrderLookup, "orderId"> {
+  const order: Omit<CrmOrderLookup, "orderId"> = { pending: body.pending };
+  for (const key of PUBLIC_ORDER_FIELDS) {
+    if (body[key] !== undefined) Object.assign(order, { [key]: body[key] });
+  }
+  return order;
+}
 
 const checkoutInput = z.object({
   slug: z.string().trim().min(1).max(80),
@@ -80,6 +99,9 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     if (!checkoutReady()) {
       return { ok: false as const, message: "Online checkout is not available yet. Contact us and we will place this for you." };
     }
+    if (!takeRateLimit("checkout", 8, 10 * 60_000)) {
+      return { ok: false as const, message: "Too many checkout attempts. Please wait a few minutes, or contact us and we will place this for you." };
+    }
     const pkg = getPackage(data.slug);
     if (!pkg) return { ok: false as const, message: "That package is not available." };
     if (pkg.slug === "paddock-club") {
@@ -103,7 +125,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       const detail = await holdResponse.text().catch(() => "");
       console.error("[checkout] CRM rejected hold", holdResponse.status, detail.slice(0, 400));
       if (holdResponse.status === 409) {
-        return { ok: false as const, message: "Those seats are no longer available. Try fewer guests or another day." };
+        return { ok: false as const, message: "We don't have that many seats left for this day. Try fewer guests, or contact us by email or WhatsApp and we'll do our best to arrange more." };
       }
       return { ok: false as const, message: "We couldn't reserve those seats just now. Please try again in a moment." };
     }
@@ -144,14 +166,14 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   });
 
 export const lookupCheckoutOrder = createServerFn({ method: "GET" })
-  .validator(z.object({ sessionId: z.string().trim().min(1).max(200) }))
+  .validator(sessionIdInput)
   .handler(async ({ data }) => {
     if (!isCrmCatalogConfigured()) return { ok: true as const, pending: true };
     try {
       const response = await crmAdgpFetch(`/orders?stripeSessionId=${encodeURIComponent(data.sessionId)}`);
       if (!response.ok) return { ok: true as const, pending: true };
       const body = (await response.json()) as CrmOrderLookup;
-      return { ok: true as const, ...body };
+      return { ok: true as const, ...publicOrder(body) };
     } catch (error) {
       console.error("[checkout] lookup failed", error);
       return { ok: true as const, pending: true };
@@ -159,9 +181,9 @@ export const lookupCheckoutOrder = createServerFn({ method: "GET" })
   });
 
 export const confirmPaidCheckout = createServerFn({ method: "POST" })
-  .validator(z.object({ sessionId: z.string().trim().min(1).max(200) }))
+  .validator(sessionIdInput)
   .handler(async ({ data }) => {
-    if (!isCrmCatalogConfigured() || !stripeSecret()) {
+    if (!isCrmCatalogConfigured() || !stripeSecret() || !takeRateLimit("confirm", 20, 10 * 60_000)) {
       return { ok: true as const, pending: true as const };
     }
     try {
@@ -169,7 +191,7 @@ export const confirmPaidCheckout = createServerFn({ method: "POST" })
       if (existing.ok) {
         const body = (await existing.json()) as CrmOrderLookup;
         if (!body.pending && body.orderReference) {
-          return { ok: true as const, pending: false as const, ...body };
+          return { ok: true as const, ...publicOrder(body), pending: false as const };
         }
       }
     } catch (error) {
@@ -199,7 +221,7 @@ export const confirmPaidCheckout = createServerFn({ method: "POST" })
         if (lookup.ok) {
           const body = (await lookup.json()) as CrmOrderLookup;
           if (!body.pending && body.orderReference) {
-            return { ok: true as const, pending: false as const, ...body };
+            return { ok: true as const, ...publicOrder(body), pending: false as const };
           }
         }
       } catch (error) {

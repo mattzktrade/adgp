@@ -2,9 +2,15 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { isPermanentFulfillmentFailure } from "@/lib/stripe-webhook";
+import { isAdgpSession, isPermanentFulfillmentFailure } from "@/lib/stripe-webhook";
 
 describe("Stripe fulfillment failures", () => {
+  it("ignores sessions this site did not create so they are never refunded", () => {
+    expect(isAdgpSession({ metadata: null })).toBe(false);
+    expect(isAdgpSession({ metadata: { orderId: "other-site" } })).toBe(false);
+    expect(isAdgpSession({ metadata: { holdId: "h1", packageId: "p1" } })).toBe(true);
+  });
+
   it("retries missing holds and owner problems instead of refunding", () => {
     expect(isPermanentFulfillmentFailure("hold_not_found")).toBe(false);
     expect(isPermanentFulfillmentFailure("owner_profile_required")).toBe(false);

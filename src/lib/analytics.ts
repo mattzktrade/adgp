@@ -1,4 +1,5 @@
-export const GA_MEASUREMENT_ID = (import.meta.env["VITE_GA_MEASUREMENT_ID"] as string | undefined)?.trim();
+const rawGaId = (import.meta.env["VITE_GA_MEASUREMENT_ID"] as string | undefined)?.trim();
+export const GA_MEASUREMENT_ID = rawGaId && /^G-[A-Z0-9]{4,20}$/.test(rawGaId) ? rawGaId : undefined;
 
 /** ZK Sports Meta Pixel. Override with VITE_META_PIXEL_ID if Events Manager ever issues a new ID. */
 export const DEFAULT_META_PIXEL_ID = "363256217725284";

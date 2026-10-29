@@ -7,7 +7,7 @@ import { trackBeginCheckout, trackGenerateLead } from "@/lib/analytics";
 import { createCheckoutSession } from "@/lib/checkout";
 import { availabilityLabel, formatMoney, type PackageOverlay } from "@/lib/crm-catalog";
 import { dayOptionsFor, type Pkg } from "@/lib/packages";
-import { PATHS } from "@/lib/site";
+import { CONTACT_EMAIL, CONTACT_WHATSAPP_HREF, CONTACT_WHATSAPP_LABEL, PATHS } from "@/lib/site";
 import { submitAvailabilityRequest } from "@/lib/submit-enquiry";
 
 const field =
@@ -46,8 +46,23 @@ export function CheckoutPanel({
   const currency = selected?.currency || overlay.currency;
   const validGuests = Number.isInteger(guestCount) && guestCount > 0;
   const total = selected?.buyable && validGuests ? selected.unitPrice * guestCount : null;
+  const stockLimit = canBuy && selected ? Math.max(1, Math.min(200, selected.sellable)) : null;
+  const maxGuests = stockLimit ?? 200;
+  const [limitHit, setLimitHit] = useState(false);
+
+  useEffect(() => {
+    setLimitHit(false);
+    if (stockLimit !== null && Number(guests) > stockLimit) setGuests(String(stockLimit));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stockLimit]);
 
   const changeGuests = (next: number) => {
+    if (stockLimit !== null && next > stockLimit) {
+      setGuests(String(stockLimit));
+      setLimitHit(true);
+      return;
+    }
+    setLimitHit(false);
     setGuests(String(Math.min(200, Math.max(1, next))));
   };
 
@@ -190,14 +205,23 @@ export function CheckoutPanel({
                       type="number"
                       name="guests"
                       min={1}
-                      max={200}
+                      max={maxGuests}
                       value={guests}
-                      onChange={(e) => setGuests(e.target.value)}
+                      onChange={(e) => {
+                        const typed = Number(e.target.value);
+                        if (stockLimit !== null && Number.isFinite(typed) && typed > stockLimit) {
+                          setGuests(String(stockLimit));
+                          setLimitHit(true);
+                          return;
+                        }
+                        setLimitHit(false);
+                        setGuests(e.target.value);
+                      }}
                       className="w-14 bg-transparent text-center text-lg outline-none"
                     />
                     <button
                       type="button"
-                      disabled={pending || guestCount >= 200}
+                      disabled={pending || guestCount >= 200 || (limitHit && guestCount >= maxGuests)}
                       onClick={() => changeGuests(guestCount + 1)}
                       className="flex h-9 w-9 items-center justify-center border border-input text-lg disabled:opacity-40"
                       aria-label="More guests"
@@ -206,6 +230,21 @@ export function CheckoutPanel({
                     </button>
                   </div>
                 </div>
+                {limitHit && stockLimit !== null ? (
+                  <div className="mt-3 border border-primary/60 bg-primary/10 p-3 text-sm" role="status">
+                    <p>
+                      We only have {stockLimit} seat{stockLimit === 1 ? "" : "s"} available to book online for {day}. Need more? Contact us and we'll do our best to arrange it.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                      <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-4">
+                        {CONTACT_EMAIL}
+                      </a>
+                      <a href={CONTACT_WHATSAPP_HREF} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                        WhatsApp {CONTACT_WHATSAPP_LABEL}
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

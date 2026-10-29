@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { fulfillCheckoutSession, isPermanentFulfillmentFailure, refundAndAlert, releaseCheckoutSession } from "@/lib/stripe-webhook";
+import { fulfillCheckoutSession, isAdgpSession, isPermanentFulfillmentFailure, refundAndAlert, releaseCheckoutSession } from "@/lib/stripe-webhook";
 
 async function handleStripeWebhook(request: Request): Promise<Response> {
   const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
@@ -26,6 +26,7 @@ async function handleStripeWebhook(request: Request): Promise<Response> {
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
+      if (!isAdgpSession(session)) return new Response(JSON.stringify({ ok: true, ignored: true }), { status: 200 });
       const result = await fulfillCheckoutSession(session);
       if (!result.ok) {
         console.error("[stripe webhook] commit failed", result.message);
@@ -36,7 +37,7 @@ async function handleStripeWebhook(request: Request): Promise<Response> {
         return new Response(JSON.stringify({ error: result.message }), { status: 500 });
       }
     }
-    if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {
+    if ((event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") && isAdgpSession(event.data.object)) {
       await releaseCheckoutSession(event.data.object);
     }
     return new Response(JSON.stringify({ ok: true }), { status: 200 });

@@ -20,7 +20,7 @@ import {
   trackPageView,
 } from "../lib/analytics";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { organizationJsonLd, plainMeta, websiteJsonLd } from "../lib/seo";
+import { inlineJson, organizationJsonLd, plainMeta, websiteJsonLd } from "../lib/seo";
 import { BRAND } from "../lib/site";
 
 function NotFoundComponent() {
@@ -115,11 +115,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(organizationJsonLd()),
+        children: inlineJson(organizationJsonLd()),
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify(websiteJsonLd()),
+        children: inlineJson(websiteJsonLd()),
       },
       {
         children: metaPixelBootstrapScript(META_PIXEL_ID),

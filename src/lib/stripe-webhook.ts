@@ -12,6 +12,11 @@ export function isPermanentFulfillmentFailure(message: string): boolean {
   );
 }
 
+/** The Stripe account can carry other ZK checkouts; sessions this site didn't create must never be fulfilled or refunded here. */
+export function isAdgpSession(session: Pick<Stripe.Checkout.Session, "metadata">): boolean {
+  return Boolean(session.metadata?.holdId && session.metadata?.packageId);
+}
+
 function metadata(session: Stripe.Checkout.Session) {
   const meta = session.metadata ?? {};
   return {

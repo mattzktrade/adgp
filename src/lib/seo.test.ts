@@ -2,9 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import { PACKAGES } from "@/lib/packages";
 import { BRAND, CONTACT_EMAIL, CONTACT_WHATSAPP_HREF, CONTACT_WHATSAPP_LABEL, SITE_URL, absoluteUrl, packagePath } from "@/lib/site";
-import { buildSitemapXml, pageHead, plainMeta, productJsonLd, sitemapEntries } from "@/lib/seo";
+import { buildSitemapXml, inlineJson, pageHead, plainMeta, productJsonLd, sitemapEntries } from "@/lib/seo";
 
 describe("SEO helpers", () => {
+  it("keeps structured data from closing its script tag", () => {
+    const json = inlineJson({ name: "</script><script>alert(1)</script>" });
+    expect(json).not.toContain("<");
+    expect(JSON.parse(json)).toEqual({ name: "</script><script>alert(1)</script>" });
+  });
+
   it("builds production canonicals and Open Graph tags", () => {
     const head = pageHead({
       title: "Test title",

@@ -17,6 +17,11 @@ export function plainMeta(text: string): string {
   return text.replace(/\s*&\s*/g, " and ").replace(/\s+/g, " ").trim();
 }
 
+/** JSON for an inline <script>; escapes `<` so CRM-sourced text can't close the tag. */
+export function inlineJson(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+}
+
 export function pageHead({ title, description, path, image, imageAlt, noindex, jsonLd }: PageHeadInput) {
   const url = absoluteUrl(path);
   const ogImage = absoluteUrl(image || BRAND.defaultOgPath);
@@ -45,7 +50,7 @@ export function pageHead({ title, description, path, image, imageAlt, noindex, j
     links: [{ rel: "canonical", href: url }],
     scripts: (jsonLd ?? []).map((data) => ({
       type: "application/ld+json",
-      children: JSON.stringify(data),
+      children: inlineJson(data),
     })),
   };
 }

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { buildAvailabilityLead } from "@/lib/crm-lead";
+import { takeRateLimit } from "@/lib/rate-limit";
 
 const availabilityInput = z.object({
   slug: z.string().trim().min(1).max(80),
@@ -17,6 +18,9 @@ const CRM_LEAD_WEBHOOK_URL = "https://zk-sports.trade/api/webhooks/marketing-lea
 export const submitAvailabilityRequest = createServerFn({ method: "POST" })
   .validator(availabilityInput)
   .handler(async ({ data }) => {
+    if (!takeRateLimit("enquiry", 5, 10 * 60_000)) {
+      return { ok: false as const, message: "Too many requests. Please wait a few minutes, or email or WhatsApp us directly." };
+    }
     const lead = buildAvailabilityLead({
       ...data,
       leadId: `adgp-${crypto.randomUUID()}`,
