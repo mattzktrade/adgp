@@ -18,7 +18,11 @@ export function isCrmCatalogConfigured(): boolean {
 }
 
 export function isCheckoutReady(): boolean {
-  return isWebsiteCheckoutEnabled() && isCrmCatalogConfigured() && Boolean(process.env.STRIPE_SECRET_KEY?.trim());
+  return (
+    isWebsiteCheckoutEnabled() &&
+    isCrmCatalogConfigured() &&
+    Boolean(process.env.STRIPE_SECRET_KEY?.trim())
+  );
 }
 
 export async function crmAdgpFetch(path: string, init: RequestInit = {}): Promise<Response> {
@@ -29,8 +33,10 @@ export async function crmAdgpFetch(path: string, init: RequestInit = {}): Promis
   if (init.body && !headers.has("content-type")) {
     headers.set("content-type", "application/json");
   }
+  headers.set("cache-control", "no-cache");
   return fetch(`${crmAdgpApiUrl()}${path.startsWith("/") ? path : `/${path}`}`, {
     ...init,
+    cache: "no-store",
     headers,
   });
 }

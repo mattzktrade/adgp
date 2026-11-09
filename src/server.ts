@@ -55,10 +55,20 @@ const SECURITY_HEADERS: Record<string, string> = {
   "cross-origin-opener-policy": "same-origin-allow-popups",
 };
 
-function withSecurityHeaders(response: Response): Response {
+function withSecurityHeaders(response: Response, request?: Request): Response {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     if (!headers.has(name)) headers.set(name, value);
+  }
+  const contentType = headers.get("content-type") ?? "";
+  const pathname = request ? new URL(request.url).pathname : "";
+  const liveCatalogPage =
+    contentType.includes("text/html") ||
+    pathname.includes("/_serverFn") ||
+    pathname.includes("/_server/");
+  if (liveCatalogPage) {
+    headers.set("cache-control", "private, no-store");
+    headers.set("pragma", "no-cache");
   }
   return new Response(response.body, {
     status: response.status,
@@ -72,7 +82,7 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response));
+      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response), request);
     } catch (error) {
       console.error(error);
       return withSecurityHeaders(
@@ -80,6 +90,7 @@ export default {
           status: 500,
           headers: { "content-type": "text/html; charset=utf-8" },
         }),
+        request,
       );
     }
   },

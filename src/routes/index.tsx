@@ -4,12 +4,14 @@ import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts
 import { CredentialBadges } from "@/components/site/CredentialBadges";
 import { CircuitMap } from "@/components/site/CircuitMap";
 import { formatMoney, type PackageOverlay } from "@/lib/crm-catalog";
-import { loadListingStorefront } from "@/lib/storefront";
+import { loadListingStorefront, STOREFRONT_CACHE_HEADERS } from "@/lib/storefront";
 import { EVENT, PACKAGES, TIERS, type Pkg, type Tier } from "@/lib/packages";
 import { breadcrumbJsonLd, eventJsonLd, pageHead } from "@/lib/seo";
 import { BRAND, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
+  staleTime: 0,
+  headers: () => STOREFRONT_CACHE_HEADERS,
   loader: async () => loadListingStorefront(),
   head: () =>
     pageHead({
