@@ -7,12 +7,14 @@ import { PackageMedia } from "@/components/site/PackageMedia";
 import { Countdown, Eyebrow, Footer, Nav, Reveal } from "@/components/site/parts";
 import { trackViewContent } from "@/lib/analytics";
 import { availabilityLabel, formatMoney, preferredDayPrice } from "@/lib/crm-catalog";
-import { loadPackageStorefront } from "@/lib/storefront";
+import { loadPackageStorefront, STOREFRONT_CACHE_HEADERS } from "@/lib/storefront";
 import { EVENT, getPackage, PACKAGES, relatedGuideFor, TIERS } from "@/lib/packages";
 import { breadcrumbJsonLd, faqJsonLd, pageHead, productJsonLd, videoJsonLd } from "@/lib/seo";
 import { BRAND, PATHS, packagePath } from "@/lib/site";
 
 export const Route = createFileRoute("/packages/$slug")({
+  staleTime: 0,
+  headers: () => STOREFRONT_CACHE_HEADERS,
   loader: async ({ params }) => {
     const pkg = getPackage(params.slug);
     if (!pkg) throw notFound();

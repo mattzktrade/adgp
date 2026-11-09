@@ -2,12 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { GuideLayout } from "@/components/site/PageChrome";
 import { formatMoney } from "@/lib/crm-catalog";
-import { loadListingStorefront } from "@/lib/storefront";
+import { loadListingStorefront, STOREFRONT_CACHE_HEADERS } from "@/lib/storefront";
 import { EVENT, PACKAGES, TIERS } from "@/lib/packages";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 import { BRAND, PATHS } from "@/lib/site";
 
 export const Route = createFileRoute("/compare")({
+  staleTime: 0,
+  headers: () => STOREFRONT_CACHE_HEADERS,
   loader: async () => loadListingStorefront(),
   head: () =>
     pageHead({
